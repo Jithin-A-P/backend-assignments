@@ -2,7 +2,7 @@ import express from 'express'
 import 'reflect-metadata'
 import employeeRouter from './routers/employee-router'
 import loggerMiddleware from './middlewares/logger-middleware'
-import { dataSource } from './data-source'
+import dataSource from './data-source'
 
 const server = express()
 const PORT = 3000
@@ -18,6 +18,6 @@ dataSource
       console.log(`Server started on port : ${PORT}`)
     })
   })
-  .catch((err) => {
-    console.log("Error, can't connect to db")
+  .catch((err: Error) => {
+    console.log("Error, can't connect to db : ", err)
   })

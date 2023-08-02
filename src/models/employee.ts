@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity('employee') // PARAM: name of the table
 class Employee {
     @PrimaryGeneratedColumn()
-    id: number
+    id?: number
 
     @Column()
     name: string
@@ -12,10 +12,13 @@ class Employee {
     email: string
 
     @CreateDateColumn()
-    createdAt: Date
+    createdAt?: Date
 
     @UpdateDateColumn()
-    updatedAt: Date
+    updatedAt?: Date
+
+    @DeleteDateColumn()
+    deletedAt?: Date
 }
 
 export default Employee
