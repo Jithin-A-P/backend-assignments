@@ -1,4 +1,5 @@
 import express from 'express'
+import 'reflect-metadata'
 import employeeRouter from './routers/employee_router'
 import loggerMiddleware from './middlewares/logger_middleware'
 
