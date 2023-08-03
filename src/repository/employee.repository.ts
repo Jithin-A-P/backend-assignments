@@ -1,24 +1,31 @@
-import { DataSource } from 'typeorm'
-import dataSource from '../db/postgres.db'
+import { Repository } from 'typeorm'
 import Employee from '../entity/employee.entity'
 
 class EmployeeRepository {
-    private dataSource: DataSource
-
-    constructor() {
-        this.dataSource = dataSource
-    }
+    constructor(private employeeRepository: Repository<Employee>) {}
 
     findAll(): Promise<Employee[]> {
-        const employeeRepository = this.dataSource.getRepository(Employee)
-        return employeeRepository.find()
+        return this.employeeRepository.find()
     }
 
     findById(id: number): Promise<Employee> {
-        const employeeRepository = this.dataSource.getRepository(Employee)
-        return employeeRepository.findOneBy({
+        return this.employeeRepository.findOneBy({
             id: id,
         })
+    }
+    
+    removeById(id: number): Promise<Employee> {
+        return this.employeeRepository.softRemove({
+            id: id,
+        })
+    }
+
+    add(employee: Employee): Promise<Employee> {
+        return this.employeeRepository.save(employee)
+    }
+
+    update(employee: Employee): Promise<Employee> {
+        return this.employeeRepository.save(employee)
     }
 }
 
