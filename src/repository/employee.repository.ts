@@ -5,19 +5,24 @@ class EmployeeRepository {
     constructor(private employeeRepository: Repository<Employee>) {}
 
     findAll(): Promise<Employee[]> {
-        return this.employeeRepository.find()
+        return this.employeeRepository.find({
+            relations: {
+                address: true,
+            }
+        })
     }
 
     findById(id: number): Promise<Employee> {
-        return this.employeeRepository.findOneBy({
-            id: id,
+        return this.employeeRepository.findOne({
+            where: {id: id},
+            relations: {
+                address: true,
+            }
         })
     }
     
-    removeById(id: number): Promise<Employee> {
-        return this.employeeRepository.softRemove({
-            id: id,
-        })
+    remove(employee: Employee): Promise<Employee> {
+        return this.employeeRepository.softRemove(employee)
     }
 
     add(employee: Employee): Promise<Employee> {

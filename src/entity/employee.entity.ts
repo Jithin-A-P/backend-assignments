@@ -3,9 +3,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import Address from './address.entity'
 
 @Entity('employee') // PARAM: name of the table
 class Employee {
@@ -17,6 +19,12 @@ class Employee {
 
   @Column()
   email: string
+
+  @Column({nullable: true})
+  age?: number
+
+  @OneToOne(() => Address, (address) => address.employee, {cascade: true})
+  address?: Address
 
   @CreateDateColumn()
   createdAt?: Date
