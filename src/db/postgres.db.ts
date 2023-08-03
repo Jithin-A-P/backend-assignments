@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm'
-import Employee from './models/employee'
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
+import Employee from '../entity/employee.entity'
 
 const dataSource = new DataSource({
   type: 'postgres',
