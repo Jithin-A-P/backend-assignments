@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, ValidateNested } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsObject, IsString, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import Address from '../entity/address.entity'
 import CreateAddressDto from './create-address.dto'
@@ -13,7 +13,8 @@ class CreateEmployeeDto {
     email: string
 
     @IsNotEmpty()
-    @ValidateNested({ each: true })
+    @IsObject()
+    @ValidateNested({each: true})
     @Type(() => CreateAddressDto)
     address: Address
 }

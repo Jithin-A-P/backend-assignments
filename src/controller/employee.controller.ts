@@ -3,6 +3,7 @@ import EmployeeService from '../service/employee.service'
 import { plainToInstance } from 'class-transformer'
 import CreateEmployeeDto from '../dto/create-employee.dto'
 import { validate } from 'class-validator'
+import ValidationException from '../exception/validation.exception'
 
 class EmployeeController {
     public router: Router
@@ -23,8 +24,7 @@ class EmployeeController {
             const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body)
             const errors = await validate(createEmployeeDto)
             if(errors.length > 0) {
-                console.log(JSON.stringify(errors))
-                // TODO: throw a custom exception to be captured 
+                throw new ValidationException(400, 'Validation Error', errors)
             }
             const addedEmployee = await this.employeeService.addEmployee(name, email, address)
             res.status(201).send(addedEmployee)
@@ -33,9 +33,13 @@ class EmployeeController {
         }
     }
 
-    getAllEmployees = async (req: Request, res: Response) => {
-        const employees = await this.employeeService.getAllEmployees()
-        res.status(200).send(employees)
+    getAllEmployees = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const employees = await this.employeeService.getAllEmployees()
+            res.status(200).send(employees)
+        } catch(error) {
+            next(error)
+        }
     }
 
     getEmployeeById = async (req: Request, res: Response, next: NextFunction) => {
@@ -48,18 +52,32 @@ class EmployeeController {
         }
     }
 
-    updateEmployeeById = async (req: Request, res: Response) => {
-        const employeeId = Number(req.params.id)
-        const { name, email, address } = req.body
-        const updatedEmployee = await this.employeeService.updateEmployeeById(employeeId, name, email, address)
-        res.status(200).send(updatedEmployee)
+    updateEmployeeById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const employeeId = Number(req.params.id)
+            const { name, email, address } = req.body
+            const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body)
+            const errors = await validate(createEmployeeDto)
+            if(errors.length > 0) {
+                throw new ValidationException(400, 'Validation Error', errors)
+            }
+            const updatedEmployee = await this.employeeService.updateEmployeeById(employeeId, name, email, address)
+            res.status(200).send(updatedEmployee)
+        } catch(error) {
+            next(error)
+        }
     }
 
-    removeEmployeeById = async (req: Request, res: Response) => {
-        const employeeId = Number(req.params.id)
-        await this.employeeService.removeEmployeeById(employeeId)
-        res.status(204).end()
+    removeEmployeeById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const employeeId = Number(req.params.id)
+            await this.employeeService.removeEmployeeById(employeeId)
+            res.status(204).end()
+        } catch(error) {
+            next(error)
+        }
     }
 }
+
 
 export default EmployeeController
