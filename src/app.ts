@@ -1,8 +1,9 @@
-import express from 'express'
+import express, {Request, Response, NextFunction} from 'express'
 import 'reflect-metadata'
 import loggerMiddleware from './middleware/logger.middleware'
 import dataSource from './db/postgres.db'
 import employeeRoute from './routes/employee.route'
+import errorMiddleware from './middleware/error.middleware'
 
 const server = express()
 const PORT = 3000
@@ -10,6 +11,8 @@ const PORT = 3000
 server.use(express.json())
 server.use(loggerMiddleware)
 server.use('/employees', employeeRoute)
+
+server.use(errorMiddleware)
 
 dataSource
   .initialize()
