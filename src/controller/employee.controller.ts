@@ -1,5 +1,8 @@
-import e, { Router, Request, Response, NextFunction } from 'express'
+import { Router, Request, Response, NextFunction } from 'express'
 import EmployeeService from '../service/employee.service'
+import { plainToInstance } from 'class-transformer'
+import CreateEmployeeDto from '../dto/create-employee.dto'
+import { validate } from 'class-validator'
 
 class EmployeeController {
     public router: Router
@@ -17,6 +20,12 @@ class EmployeeController {
     addEmployee = async (req: Request, res: Response, next: NextFunction) => {
         try {       
             const {name, email, address} = req.body
+            const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body)
+            const errors = await validate(createEmployeeDto)
+            if(errors.length > 0) {
+                console.log(JSON.stringify(errors))
+                // TODO: throw a custom exception to be captured 
+            }
             const addedEmployee = await this.employeeService.addEmployee(name, email, address)
             res.status(201).send(addedEmployee)
         } catch(error) {
