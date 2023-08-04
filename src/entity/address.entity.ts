@@ -1,37 +1,22 @@
 import {
     Column,
-    CreateDateColumn,
-    DeleteDateColumn,
     Entity,
     JoinColumn,
     OneToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
   } from 'typeorm'
 import Employee from './employee.entity'
+import AbstractEntity from './absract.entiry'
   
   @Entity('address') // PARAM: name of the table
-  class Address {
-    @PrimaryGeneratedColumn()
-    id?: number
-  
+  class Address extends AbstractEntity {
     @Column()
     line1: string
   
     @Column({nullable: true})
-    line2?: string
+    line2: string
   
     @Column()
     pincode: string
-  
-    @CreateDateColumn()
-    createdAt?: Date
-  
-    @UpdateDateColumn()
-    updatedAt?: Date
-  
-    @DeleteDateColumn()
-    deletedAt?: Date
 
     @OneToOne(() => Employee, (employee) => employee.address)
     @JoinColumn()

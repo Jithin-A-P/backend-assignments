@@ -1,3 +1,5 @@
+import bcrypt, { hash } from 'bcrypt'
+import jsonwebtoken from 'jsonwebtoken'
 import Address from '../entity/address.entity'
 import Employee from '../entity/employee.entity'
 import HttpException from '../exception/http.exception'
@@ -22,22 +24,25 @@ class EmployeeService {
         return this.employeeRepository.remove(employee)
     }
 
-    addEmployee(name: string, email: string, address: any): Promise<Employee> {
+    async addEmployee(name: string, email: string, address: any, password: any): Promise<Employee> {
         const newEmployeeAddress = new Address()
         newEmployeeAddress.line1 = address.line1
         if(address.line2) newEmployeeAddress.line2 = address.line2
         newEmployeeAddress.pincode = address.pincode
-        const newEmployee: Employee = {
+        const newEmployee = {
             name: name,
             email: email,
-            address: newEmployeeAddress
+            address: newEmployeeAddress,
+            password: await hash(password, 10)
         }
-        return this.employeeRepository.add(newEmployee)
+        return this.employeeRepository.add(newEmployee as Employee)
     }
 
     async updateEmployeeById(id: number, name: string, email: string, address: any): Promise<Employee> {
         const employee = await this.getEmployeeById(id)
-        if(employee) return this.employeeRepository.update({
+        if(!employee) 
+            throw new HttpException(404, 'Not found')
+        return this.employeeRepository.update({
             ...employee,
             name: name,
             email: email,
@@ -48,6 +53,27 @@ class EmployeeService {
                 pincode: address.pincode
             }
         })
+    }
+
+    loginEmployee = async (email: string, password: string) => {
+        const employee = await this.employeeRepository.findByEmail(email)
+        if(!employee)
+            throw new HttpException(400, 'Employee not found')
+
+        const loginStatus = await bcrypt.compare(password, employee.password)
+        if(!loginStatus)
+            throw new HttpException(401, "Incorrect username or password")
+
+        const payload = {
+            name: employee.name,
+            email: employee.email
+        }
+
+        const token = jsonwebtoken.sign(payload, 'ABCDE', {
+            expiresIn: '1h'
+        })
+
+        return { token: token }
     }
 }
 

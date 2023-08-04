@@ -20,6 +20,15 @@ class EmployeeRepository {
             }
         })
     }
+
+    findByEmail(email: string): Promise<Employee> {
+        return this.employeeRepository.findOne({
+            where: {email: email},
+            relations: {
+                address: true,
+            }
+        })
+    }
     
     remove(employee: Employee): Promise<Employee> {
         return this.employeeRepository.softRemove(employee)

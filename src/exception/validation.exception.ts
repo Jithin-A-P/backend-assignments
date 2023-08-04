@@ -1,6 +1,8 @@
 import { ValidationError } from 'class-validator'
 import HttpException from './http.exception'
 
+// Changes 
+// Throw 400 and a constant validation exception always
 class ValidationException extends HttpException {
     public errorPayload = {}
     constructor(status: number, public message: string, private validationErrors: ValidationError[]) {

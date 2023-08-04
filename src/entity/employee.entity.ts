@@ -1,19 +1,13 @@
 import {
   Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   OneToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm'
 import Address from './address.entity'
+import AbstractEntity from './absract.entiry'
 
 @Entity('employee') // PARAM: name of the table
-class Employee {
-  @PrimaryGeneratedColumn()
-  id?: number
-
+class Employee extends AbstractEntity {
   @Column()
   name: string
 
@@ -21,19 +15,13 @@ class Employee {
   email: string
 
   @Column({nullable: true})
-  age?: number
+  age: number
 
   @OneToOne(() => Address, (address) => address.employee, {cascade: true})
   address?: Address
 
-  @CreateDateColumn()
-  createdAt?: Date
-
-  @UpdateDateColumn()
-  updatedAt?: Date
-
-  @DeleteDateColumn()
-  deletedAt?: Date
+  @Column()
+  password: string
 }
 
 export default Employee
