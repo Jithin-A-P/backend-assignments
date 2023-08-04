@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-class CreateAddressDto {
+class AddressDto {
     @IsNotEmpty()
     @IsString()
     line1: string
@@ -10,4 +10,4 @@ class CreateAddressDto {
     pincode: string
 }
 
-export default CreateAddressDto
+export default AddressDto

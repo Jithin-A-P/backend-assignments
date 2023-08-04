@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import EmployeeService from '../service/employee.service'
 import { plainToInstance } from 'class-transformer'
-import CreateEmployeeDto from '../dto/create-employee.dto'
+import EmployeeDto from '../dto/employee.dto'
 import { validate } from 'class-validator'
 import ValidationException from '../exception/validation.exception'
 
@@ -21,8 +21,8 @@ class EmployeeController {
     addEmployee = async (req: Request, res: Response, next: NextFunction) => {
         try {       
             const {name, email, address} = req.body
-            const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body)
-            const errors = await validate(createEmployeeDto)
+            const employeeDto = plainToInstance(EmployeeDto, req.body)
+            const errors = await validate(employeeDto)
             if(errors.length > 0) {
                 throw new ValidationException(400, 'Validation Error', errors)
             }
@@ -56,8 +56,8 @@ class EmployeeController {
         try {
             const employeeId = Number(req.params.id)
             const { name, email, address } = req.body
-            const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body)
-            const errors = await validate(createEmployeeDto)
+            const employeeDto = plainToInstance(EmployeeDto, req.body)
+            const errors = await validate(employeeDto)
             if(errors.length > 0) {
                 throw new ValidationException(400, 'Validation Error', errors)
             }
