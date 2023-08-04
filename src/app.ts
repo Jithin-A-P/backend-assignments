@@ -1,4 +1,7 @@
-import express, {Request, Response, NextFunction} from 'express'
+import * as dotenv from 'dotenv'
+dotenv.config({ path: __dirname + '/.env'})
+
+import express from 'express'
 import 'reflect-metadata'
 import loggerMiddleware from './middleware/logger.middleware'
 import dataSource from './db/postgres.db'
@@ -6,7 +9,7 @@ import employeeRoute from './routes/employee.route'
 import errorMiddleware from './middleware/error.middleware'
 
 const server = express()
-const PORT = 3000
+const PORT = process.env.PORT
 
 server.use(express.json())
 server.use(loggerMiddleware)
