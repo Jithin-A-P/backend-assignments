@@ -5,6 +5,7 @@ import {
 } from 'typeorm'
 import Address from './address.entity'
 import AbstractEntity from './absract.entiry'
+import { Role } from '../utils/role.enum'
 
 @Entity('employee') // PARAM: name of the table
 class Employee extends AbstractEntity {
@@ -22,6 +23,9 @@ class Employee extends AbstractEntity {
 
   @Column()
   password: string
+
+  @Column({ default: Role.DEVELOPER })
+  role: Role
 }
 
 export default Employee

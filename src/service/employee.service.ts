@@ -4,6 +4,7 @@ import Address from '../entity/address.entity'
 import Employee from '../entity/employee.entity'
 import HttpException from '../exception/http.exception'
 import EmployeeRepository from '../repository/employee.repository'
+import { Role } from '../utils/role.enum'
 
 class EmployeeService {
     constructor(private employeeRepository: EmployeeRepository) {}
@@ -24,7 +25,7 @@ class EmployeeService {
         return this.employeeRepository.remove(employee)
     }
 
-    async addEmployee(name: string, email: string, address: any, password: any): Promise<Employee> {
+    async addEmployee(name: string, email: string, address: any, role: Role, password: string): Promise<Employee> {
         const newEmployeeAddress = new Address()
         newEmployeeAddress.line1 = address.line1
         if(address.line2) newEmployeeAddress.line2 = address.line2
@@ -33,7 +34,8 @@ class EmployeeService {
             name: name,
             email: email,
             address: newEmployeeAddress,
-            password: await hash(password, 10)
+            role: role,
+            password: await hash(password, 10),
         }
         return this.employeeRepository.add(newEmployee as Employee)
     }
@@ -66,7 +68,8 @@ class EmployeeService {
 
         const payload = {
             name: employee.name,
-            email: employee.email
+            email: employee.email,
+            role: employee.role
         }
 
         const token = jsonwebtoken.sign(payload, 'ABCDE', {

@@ -5,29 +5,31 @@ import EmployeeDto from '../dto/employee.dto'
 import { validate } from 'class-validator'
 import ValidationException from '../exception/validation.exception'
 import autheticate from '../middleware/authenticate.middleware'
+import authorize from '../middleware/authorize.middleware'
+import { Role } from '../utils/role.enum'
 
 class EmployeeController {
     public router: Router
 
     constructor(private employeeService: EmployeeService) {
         this.router = Router()
-        this.router.post('/', this.addEmployee)
         this.router.get('/', autheticate, this.getAllEmployees)
+        this.router.post('/', autheticate, authorize([Role.HR]), this.addEmployee)
         this.router.get('/:id', this.getEmployeeById)
-        this.router.put('/:id', this.updateEmployeeById)
-        this.router.delete('/:id', this.removeEmployeeById)
+        this.router.put('/:id', autheticate, authorize([Role.HR]), this.updateEmployeeById)
+        this.router.delete('/:id', autheticate, authorize([Role.HR]), this.removeEmployeeById)
         this.router.post('/login', this.loginEmployee)
     }
 
     addEmployee = async (req: Request, res: Response, next: NextFunction) => {
         try {       
-            const {name, email, address, password} = req.body // TODO: use validted DTO object to get values
+            const {name, email, address, password, role} = req.body // TODO: use validted DTO object to get values
             const employeeDto = plainToInstance(EmployeeDto, req.body)
             const errors = await validate(employeeDto)
             if(errors.length > 0) {
                 throw new ValidationException(400, 'Validation Error', errors)
             }
-            const addedEmployee = await this.employeeService.addEmployee(name, email, address, password)
+            const addedEmployee = await this.employeeService.addEmployee(name, email, address, role, password)
             res.status(201).send(addedEmployee)
         } catch(error) {
             next(error)
