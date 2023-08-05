@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import jsonwebtoken from 'jsonwebtoken'
 import JwtPayload from '../utils/jwt-payload.type'
-import RequestWithUser from '../utils/request-with-use.interface'
+import RequestWithUser from '../utils/request-with-user.interface'
 
 const autheticate = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
