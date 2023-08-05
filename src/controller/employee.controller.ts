@@ -26,9 +26,8 @@ class EmployeeController {
             const {name, email, address, password, role} = req.body // TODO: use validted DTO object to get values
             const employeeDto = plainToInstance(EmployeeDto, req.body)
             const errors = await validate(employeeDto)
-            if(errors.length > 0) {
-                throw new ValidationException(400, 'Validation Error', errors)
-            }
+            if(errors.length > 0)
+                throw new ValidationException(errors)
             const addedEmployee = await this.employeeService.addEmployee(name, email, address, role, password)
             res.status(201).send(addedEmployee)
         } catch(error) {
@@ -61,9 +60,8 @@ class EmployeeController {
             const { name, email, address } = req.body
             const employeeDto = plainToInstance(EmployeeDto, req.body)
             const errors = await validate(employeeDto)
-            if(errors.length > 0) {
-                throw new ValidationException(400, 'Validation Error', errors)
-            }
+            if(errors.length > 0)
+                throw new ValidationException(errors)
             const updatedEmployee = await this.employeeService.updateEmployeeById(employeeId, name, email, address)
             res.status(200).send(updatedEmployee)
         } catch(error) {

@@ -1,12 +1,10 @@
 import { ValidationError } from 'class-validator'
 import HttpException from './http.exception'
 
-// Changes 
-// Throw 400 and a constant validation exception always
 class ValidationException extends HttpException {
     public errorPayload = {}
-    constructor(status: number, public message: string, private validationErrors: ValidationError[]) {
-        super(status, message)
+    constructor(private validationErrors: ValidationError[]) {
+        super(400, 'Validation Error')
         this.errorPayload['message'] = this.message
         this.errorPayload['errors'] = this.generateErrors(validationErrors)
     }
@@ -16,15 +14,15 @@ class ValidationException extends HttpException {
             return Object.values(validationError.constraints)
     }
 
-    private generateErrors = (errors: ValidationError[]) => {
-        const errorsObject = {}
-        errors.forEach((error) => {
-            if(error.children.length > 0)
-                errorsObject[error.property] = this.generateErrors(error.children)
+    private generateErrors = (validationErrors: ValidationError[]) => {
+        const validationErrorObject = {}
+        validationErrors.forEach((validationError) => {
+            if(validationError.children.length > 0)
+                validationErrorObject[validationError.property] = this.generateErrors(validationError.children)
             else
-                errorsObject[error.property] = this.getErrorConstraints(error)
+                validationErrorObject[validationError.property] = this.getErrorConstraints(validationError)
         })
-        return errorsObject
+        return validationErrorObject
     }
 
 }
