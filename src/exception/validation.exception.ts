@@ -3,7 +3,7 @@ import HttpException from './http.exception'
 
 class ValidationException extends HttpException {
     public errorPayload = {}
-    constructor(private validationErrors: ValidationError[]) {
+    constructor(validationErrors: ValidationError[]) {
         super(400, 'Validation Error')
         this.errorPayload['message'] = this.message
         this.errorPayload['errors'] = this.generateErrors(validationErrors)

@@ -1,10 +1,9 @@
-import bcrypt, { hash } from 'bcrypt'
+import bcrypt from 'bcrypt'
 import jsonwebtoken from 'jsonwebtoken'
-import Address from '../entity/address.entity'
 import Employee from '../entity/employee.entity'
 import HttpException from '../exception/http.exception'
 import EmployeeRepository from '../repository/employee.repository'
-import { Role } from '../utils/role.enum'
+import LoginDto from '../dto/login.dto'
 
 class EmployeeService {
     constructor(private employeeRepository: EmployeeRepository) {}
@@ -25,44 +24,33 @@ class EmployeeService {
         return this.employeeRepository.remove(employee)
     }
 
-    async addEmployee(name: string, email: string, address: any, role: Role, password: string): Promise<Employee> {
-        const newEmployeeAddress = new Address()
-        newEmployeeAddress.line1 = address.line1
-        if(address.line2) newEmployeeAddress.line2 = address.line2
-        newEmployeeAddress.pincode = address.pincode
-        const newEmployee = {
-            name: name,
-            email: email,
-            address: newEmployeeAddress,
-            role: role,
-            password: await hash(password, 10),
-        }
-        return this.employeeRepository.add(newEmployee as Employee)
+    async addEmployee(employeeDto: Employee): Promise<Employee> {
+        return this.employeeRepository.add(employeeDto)
     }
 
-    async updateEmployeeById(id: number, name: string, email: string, address: any): Promise<Employee> {
-        const employee = await this.getEmployeeById(id)
+    async updateEmployeeById(employeeDto: Employee): Promise<Employee> {
+        const employee = await this.getEmployeeById(employeeDto.id)
         if(!employee) 
-            throw new HttpException(404, `Error, employee not found with id: ${id}`)
+            throw new HttpException(404, `Error, employee not found with id: ${employeeDto.id}`)
+        const updatedAddress = employeeDto.address
         return this.employeeRepository.update({
             ...employee,
-            name: name,
-            email: email,
+            ...employeeDto,
+            updatedAt: new Date(),
             address: {
                 ...employee.address,
-                line1: address.line1,
-                line2: address.line2,
-                pincode: address.pincode
+                ...updatedAddress,
+                updatedAt: new Date()
             }
         })
     }
 
-    loginEmployee = async (email: string, password: string) => {
-        const employee = await this.employeeRepository.findByEmail(email)
+    loginEmployee = async (loginDto: LoginDto) => {
+        const employee = await this.employeeRepository.findByEmail(loginDto.email)
         if(!employee)
             throw new HttpException(400, 'Employee not found')
 
-        const loginStatus = await bcrypt.compare(password, employee.password)
+        const loginStatus = await bcrypt.compare(loginDto.password, employee.password)
         if(!loginStatus)
             throw new HttpException(401, "Incorrect username or password")
 
