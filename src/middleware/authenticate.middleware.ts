@@ -6,7 +6,7 @@ import RequestWithUser from '../utils/request-with-use.interface'
 const autheticate = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const token = getTokenFromRequestHeader(req)
-        const payload: JwtPayload = jsonwebtoken.verify(token, 'ABCDE') as JwtPayload
+        const payload: JwtPayload = jsonwebtoken.verify(token, process.env.JWT_SECRETE_KEY) as JwtPayload
         req.name = payload.name
         req.email = payload.email
         req.role = payload.role

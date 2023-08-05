@@ -43,7 +43,7 @@ class EmployeeService {
     async updateEmployeeById(id: number, name: string, email: string, address: any): Promise<Employee> {
         const employee = await this.getEmployeeById(id)
         if(!employee) 
-            throw new HttpException(404, 'Not found')
+            throw new HttpException(404, `Error, employee not found with id: ${id}`)
         return this.employeeRepository.update({
             ...employee,
             name: name,
@@ -72,9 +72,11 @@ class EmployeeService {
             role: employee.role
         }
 
-        const token = jsonwebtoken.sign(payload, process.env.JWT_SECRETE_KEY, {
-            expiresIn: process.env.JWT_EXPIRY_TIME
-        })
+        const token = jsonwebtoken.sign(
+            payload, 
+            process.env.JWT_SECRETE_KEY, 
+            { expiresIn: process.env.JWT_EXPIRY_TIME }
+        )
 
         return { token: token }
     }
