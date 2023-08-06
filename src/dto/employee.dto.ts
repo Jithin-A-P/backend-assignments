@@ -1,4 +1,5 @@
 import {
+  IsDateString,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -11,6 +12,7 @@ import { Type } from 'class-transformer'
 import Address from '../entity/address.entity'
 import AddressDto from './address.dto'
 import Role from '../utils/role.enum'
+import Status from '../utils/status.enum'
 
 class EmployeeDto {
   @IsNotEmpty()
@@ -25,12 +27,20 @@ class EmployeeDto {
   @IsString()
   password: string
 
+  @IsNotEmpty()
+  @IsDateString()
+  joiningDate: string
+
   @IsNumber()
   experience: number
 
   @IsNotEmpty()
   @IsEnum(Role)
   role: Role
+
+  @IsNotEmpty()
+  @IsEnum(Status)
+  status: Status
 
   @IsNotEmpty()
   @IsNumber()
