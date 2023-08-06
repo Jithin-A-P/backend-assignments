@@ -32,7 +32,7 @@ class EmployeeService {
     return this.employeeRepository.add(newEmployee)
   }
 
-  public updateEmployeeById = async (
+  public updateEmployee = async (
     employeeDto: Employee
   ): Promise<Employee> => {
     const employee = await this.getEmployeeById(employeeDto.id)

@@ -14,11 +14,7 @@ class EmployeeController {
   public router: Router
   constructor(private employeeService: EmployeeService) {
     this.router = Router()
-    this.router.get(
-      '/', 
-      autheticate, 
-      this.getAllEmployees
-    )
+    this.router.get('/', autheticate, this.getAllEmployees)
     this.router.post(
       '/',
       autheticate,
@@ -98,7 +94,7 @@ class EmployeeController {
       })
       const errors = await validate(employeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
-      const updatedEmployee = await this.employeeService.updateEmployeeById(
+      const updatedEmployee = await this.employeeService.updateEmployee(
         employeeDto as Employee
       )
       res.status(200).send(updatedEmployee)
