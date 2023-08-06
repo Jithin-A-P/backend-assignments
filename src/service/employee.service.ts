@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt, { hash } from 'bcrypt'
 import jsonwebtoken from 'jsonwebtoken'
 import Employee from '../entity/employee.entity'
 import HttpException from '../exception/http.exception'
@@ -25,7 +25,11 @@ class EmployeeService {
     }
 
     async addEmployee(employeeDto: Employee): Promise<Employee> {
-        return this.employeeRepository.add(employeeDto)
+        const newEmployee = {
+            ...employeeDto,
+            password: await hash(employeeDto.password, 10)
+        }
+        return this.employeeRepository.add(newEmployee)
     }
 
     async updateEmployeeById(employeeDto: Employee): Promise<Employee> {
@@ -36,11 +40,10 @@ class EmployeeService {
         return this.employeeRepository.update({
             ...employee,
             ...employeeDto,
-            updatedAt: new Date(),
+            password: await hash(employeeDto.password, 10),
             address: {
                 ...employee.address,
-                ...updatedAddress,
-                updatedAt: new Date()
+                ...updatedAddress
             }
         })
     }

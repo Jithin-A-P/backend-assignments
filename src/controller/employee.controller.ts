@@ -16,10 +16,10 @@ class EmployeeController {
     constructor(private employeeService: EmployeeService) {
         this.router = Router()
         this.router.get('/', autheticate, this.getAllEmployees)
-        this.router.post('/', autheticate, authorize([Role.HR]), this.addEmployee)
+        this.router.post('/', autheticate, authorize([Role.HR, Role.ADMIN]), this.addEmployee)
         this.router.get('/:id', this.getEmployeeById)
-        this.router.put('/:id', autheticate, authorize([Role.HR]), this.updateEmployeeById)
-        this.router.delete('/:id', autheticate, authorize([Role.HR]), this.removeEmployeeById)
+        this.router.put('/:id', autheticate, authorize([Role.HR, Role.ADMIN]), this.updateEmployeeById)
+        this.router.delete('/:id', autheticate, authorize([Role.HR, Role.ADMIN]), this.removeEmployeeById)
         this.router.post('/login', this.loginEmployee)
     }
 
