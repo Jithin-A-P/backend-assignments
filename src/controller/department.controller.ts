@@ -3,6 +3,11 @@ import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import DepartmentService from '../service/department.service'
+import { plainToInstance } from 'class-transformer'
+import DepartmentDto from '../dto/department.dto'
+import { validate } from 'class-validator'
+import ValidationException from '../exception/validation.exception'
+import Department from '../entity/department.entity'
 
 class DepartmentController {
   public router: Router
@@ -36,8 +41,8 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      // TODO: implement get
-      res.send()
+      const departments = await this.departmentService.getAllDepartments()
+      res.status(200).send(departments)
     } catch (error) {
       next(error)
     }
@@ -49,7 +54,11 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      // TODO: implement get one
+      const departmentId = Number(req.params.id)
+      const department = await this.departmentService.getDepartmentById(
+        departmentId
+      )
+      res.status(200).send(department)
     } catch (error) {
       next(error)
     }
@@ -61,7 +70,13 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      // TODO: implement post
+      const departmentDto = plainToInstance(DepartmentDto, req.body)
+      const errors = await validate(departmentDto)
+      if (errors.length > 0) throw new ValidationException(errors)
+      const addedDepartment = await this.departmentService.addDepartment(
+        departmentDto as Department
+      )
+      res.status(201).send(addedDepartment)
     } catch (error) {
       next(error)
     }
@@ -73,7 +88,13 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      // TODO: implement put
+      const departmentDto = plainToInstance(DepartmentDto, req.body)
+      const errors = await validate(departmentDto)
+      if (errors.length > 0) throw new ValidationException(errors)
+      const updatedDepartment = await this.departmentService.updateDepartment(
+        departmentDto as Department
+      )
+      res.status(200).send(updatedDepartment)
     } catch (error) {
       next(error)
     }
@@ -85,7 +106,9 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      // TODO: implement delete
+      const employeeId = Number(req.params.id)
+      await this.departmentService.removeDepartmentById(employeeId)
+      res.status(204).end()
     } catch (error) {
       next(error)
     }
