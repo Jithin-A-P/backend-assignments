@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { Role } from './role.enum'
+import Role from './role.enum'
 
 interface RequestWithUser extends Request {
   name: string

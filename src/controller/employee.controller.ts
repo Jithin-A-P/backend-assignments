@@ -6,7 +6,7 @@ import { validate } from 'class-validator'
 import ValidationException from '../exception/validation.exception'
 import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
-import { Role } from '../utils/role.enum'
+import Role from '../utils/role.enum'
 import Employee from '../entity/employee.entity'
 import LoginDto from '../dto/login.dto'
 
@@ -17,14 +17,15 @@ class EmployeeController {
     this.router.get(
       '/', 
       autheticate, 
-      this.getAllEmployees)
+      this.getAllEmployees
+    )
     this.router.post(
       '/',
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
       this.addEmployee
     )
-    this.router.get('/:id', this.getEmployeeById)
+    this.router.get('/:id', autheticate, this.getEmployeeById)
     this.router.put(
       '/:id',
       autheticate,

@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm'
 import Address from './address.entity'
 import AbstractEntity from './absract.entity'
-import { Role } from '../utils/role.enum'
+import Role from '../utils/role.enum'
 import Department from './department.entity'
 
 @Entity('employee') // PARAM: name of the table

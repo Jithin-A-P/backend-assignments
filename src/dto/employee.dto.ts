@@ -10,7 +10,7 @@ import {
 import { Type } from 'class-transformer'
 import Address from '../entity/address.entity'
 import AddressDto from './address.dto'
-import { Role } from '../utils/role.enum'
+import Role from '../utils/role.enum'
 
 class EmployeeDto {
   @IsNotEmpty()

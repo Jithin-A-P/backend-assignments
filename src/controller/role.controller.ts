@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import { Role } from '../utils/role.enum'
+import Role from '../utils/role.enum'
 
 class RoleController {
     public router: Router
