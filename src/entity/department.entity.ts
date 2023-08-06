@@ -4,11 +4,11 @@ import Employee from './employee.entity'
 
 @Entity('department')
 class Department extends AbstractEntity {
-    @Column()
-    name: string
+  @Column()
+  name: string
 
-    @OneToMany(() => Employee, (employee) => employee.department)
-    employees: Employee[]
+  @OneToMany(() => Employee, (employee) => employee.department)
+  employees: Employee[]
 }
 
 export default Department

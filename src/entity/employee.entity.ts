@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-} from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm'
 import Address from './address.entity'
 import AbstractEntity from './absract.entity'
 import { Role } from '../utils/role.enum'
@@ -17,7 +11,7 @@ class Employee extends AbstractEntity {
 
   @Column()
   email: string
-  
+
   @Column()
   joiningDate: string
 
@@ -26,7 +20,7 @@ class Employee extends AbstractEntity {
 
   @Column({ default: 0 })
   experience: number
-  
+
   @Column({ default: Role.DEVELOPER })
   role: Role
 
