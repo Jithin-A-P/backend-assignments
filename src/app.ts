@@ -7,13 +7,15 @@ import loggerMiddleware from './middleware/logger.middleware'
 import dataSource from './db/postgres.db'
 import employeeRoute from './routes/employee.route'
 import errorMiddleware from './middleware/error.middleware'
+import roleRoute from './routes/role.route'
 
 const server = express()
 const PORT = process.env.PORT
 
 server.use(express.json())
 server.use(loggerMiddleware)
-server.use('/employees', employeeRoute)
+server.use('/api/employees', employeeRoute)
+server.use('/api/roles', roleRoute)
 
 server.use(errorMiddleware)
 
