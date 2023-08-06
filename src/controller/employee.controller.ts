@@ -43,13 +43,20 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const employeeDto = plainToInstance(EmployeeDto, req.body)
       const errors = await validate(employeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
       const addedEmployee = await this.employeeService.addEmployee(
         employeeDto as Employee
       )
-      res.status(201).send(addedEmployee)
+      res.status(201)
+      res.locals = {
+        data: addedEmployee,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -61,8 +68,15 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const employees = await this.employeeService.getAllEmployees()
-      res.status(200).send(employees)
+      res.status(200)
+      res.locals = {
+        data: employees,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -74,9 +88,16 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const employeeId = Number(req.params.id)
       const employee = await this.employeeService.getEmployeeById(employeeId)
-      res.status(200).send(employee)
+      res.status(200)
+      res.locals = {
+        data: employee,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -88,6 +109,7 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const employeeDto = plainToInstance(EmployeeDto, {
         ...req.body,
         id: parseInt(req.params.id),
@@ -97,7 +119,13 @@ class EmployeeController {
       const updatedEmployee = await this.employeeService.updateEmployee(
         employeeDto as Employee
       )
-      res.status(200).send(updatedEmployee)
+      res.status(200)
+      res.locals = {
+        data: updatedEmployee,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -111,7 +139,8 @@ class EmployeeController {
     try {
       const employeeId = Number(req.params.id)
       await this.employeeService.removeEmployeeById(employeeId)
-      res.status(204).end()
+      res.status(204)
+      next()
     } catch (error) {
       next(error)
     }
@@ -123,11 +152,18 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const credentialsDto = plainToInstance(LoginDto, req.body)
       const errors = await validate(credentialsDto)
       if (errors.length > 0) throw new ValidationException(errors)
       const token = await this.employeeService.loginEmployee(credentialsDto)
-      res.status(200).send({ data: token })
+      res.status(200)
+      res.locals = {
+        data: token,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }

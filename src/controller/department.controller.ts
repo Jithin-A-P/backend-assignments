@@ -41,8 +41,15 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const departments = await this.departmentService.getAllDepartments()
-      res.status(200).send(departments)
+      res.status(200)
+      res.locals = {
+        data: departments,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -54,11 +61,18 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const departmentId = Number(req.params.id)
       const department = await this.departmentService.getDepartmentById(
         departmentId
       )
-      res.status(200).send(department)
+      res.status(200)
+      res.locals = {
+        data: department,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -70,13 +84,20 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const departmentDto = plainToInstance(DepartmentDto, req.body)
       const errors = await validate(departmentDto)
       if (errors.length > 0) throw new ValidationException(errors)
       const addedDepartment = await this.departmentService.addDepartment(
         departmentDto as Department
       )
-      res.status(201).send(addedDepartment)
+      res.status(201)
+      res.locals = {
+        data: addedDepartment,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -88,13 +109,20 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
+      const startTime = new Date().getTime()
       const departmentDto = plainToInstance(DepartmentDto, req.body)
       const errors = await validate(departmentDto)
       if (errors.length > 0) throw new ValidationException(errors)
       const updatedDepartment = await this.departmentService.updateDepartment(
         departmentDto as Department
       )
-      res.status(200).send(updatedDepartment)
+      res.status(200)
+      res.locals = {
+        data: updatedDepartment,
+        errors: null,
+        startTime: startTime
+      }
+      next()
     } catch (error) {
       next(error)
     }
@@ -108,7 +136,8 @@ class DepartmentController {
     try {
       const employeeId = Number(req.params.id)
       await this.departmentService.removeDepartmentById(employeeId)
-      res.status(204).end()
+      res.status(204)
+      next()
     } catch (error) {
       next(error)
     }

@@ -9,6 +9,7 @@ import employeeRoute from './routes/employee.route'
 import errorMiddleware from './middleware/error.middleware'
 import roleRoute from './routes/role.route'
 import departmentRoute from './routes/department.route'
+import jsonFormatter from './middleware/jsonformatter.middleware'
 
 const server = express()
 const PORT = process.env.PORT
@@ -18,7 +19,7 @@ server.use(loggerMiddleware)
 server.use('/api/employees', employeeRoute)
 server.use('/api/departments', departmentRoute)
 server.use('/api/roles', roleRoute)
-
+server.use(jsonFormatter)
 server.use(errorMiddleware)
 
 dataSource
