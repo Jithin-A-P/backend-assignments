@@ -1,11 +1,14 @@
 import {
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToOne,
 } from 'typeorm'
 import Address from './address.entity'
-import AbstractEntity from './absract.entiry'
+import AbstractEntity from './absract.entity'
 import { Role } from '../utils/role.enum'
+import Department from './department.entity'
 
 @Entity('employee') // PARAM: name of the table
 class Employee extends AbstractEntity {
@@ -14,18 +17,24 @@ class Employee extends AbstractEntity {
 
   @Column()
   email: string
-
-  @Column({nullable: true})
-  age: number
-
-  @OneToOne(() => Address, (address) => address.employee, {cascade: true})
-  address?: Address
+  
+  @Column()
+  joiningDate: string
 
   @Column()
   password: string
 
+  @Column({ default: 0 })
+  experience: number
+  
   @Column({ default: Role.DEVELOPER })
   role: Role
+
+  @ManyToOne(() => Department, (department) => department.employees)
+  department: number
+
+  @OneToOne(() => Address, (address) => address.employee, { cascade: true })
+  address: Address
 }
 
 export default Employee
