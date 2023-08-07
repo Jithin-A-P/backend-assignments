@@ -16,18 +16,26 @@ const errorMiddleware = (
       message: `${res.locals.traceId} : ${error.message}`,
     })
     console.log(error.stack)
+    res.status(500)
+    res.statusMessage = HttpStatusMessages['CODE_500']
     if (error instanceof ValidationException) {
       res.statusMessage = HttpStatusMessages[`CODE_${error.status}`]
       res.status(error.status).send(error.errorPayload)
       return
     }
     if (error instanceof HttpException) {
+      res.status(error.status)
       res.statusMessage = HttpStatusMessages[`CODE_${error.status}`]
-      res.status(error.status).send({ error: error.message })
-      return
+      res.locals.errors = error.message
     }
-    res.statusMessage = HttpStatusMessages['CODE_500']
-    res.status(500).send({ error: error.message })
+    res.send({ 
+      data: null,
+      error: res.locals.errors,
+      message: res.statusMessage,
+      meta: {
+        took: new Date().getTime() - res.locals.startTime
+      }
+    })
   } catch (error) {
     next(error)
   }
