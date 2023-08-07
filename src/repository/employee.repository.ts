@@ -7,8 +7,7 @@ class EmployeeRepository {
   public findAll = (): Promise<Employee[]> => {
     return this.employeeRepository.find({
       relations: {
-        address: true,
-        department: true
+        address: true
       },
     })
   }
