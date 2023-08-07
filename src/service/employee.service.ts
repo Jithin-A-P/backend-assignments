@@ -4,6 +4,7 @@ import Employee from '../entity/employee.entity'
 import HttpException from '../exception/http.exception'
 import EmployeeRepository from '../repository/employee.repository'
 import LoginDto from '../dto/login.dto'
+import NotFoundException from '../exception/not-found.exception'
 
 class EmployeeService {
   constructor(private employeeRepository: EmployeeRepository) {}
@@ -15,7 +16,7 @@ class EmployeeService {
   public getEmployeeById = async (id: number): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
     if (!employee)
-      throw new HttpException(404, `Error, employee not found with id: ${id}`)
+      throw new NotFoundException()
     return employee
   }
 
@@ -37,10 +38,7 @@ class EmployeeService {
   ): Promise<Employee> => {
     const employee = await this.getEmployeeById(employeeDto.id)
     if (!employee)
-      throw new HttpException(
-        404,
-        `Error, employee not found with id: ${employeeDto.id}`
-      )
+      throw new NotFoundException()
     const updatedAddress = employeeDto.address
     return this.employeeRepository.update({
       ...employee,
@@ -55,7 +53,7 @@ class EmployeeService {
 
   public loginEmployee = async (loginDto: LoginDto) => {
     const employee = await this.employeeRepository.findByEmail(loginDto.email)
-    if (!employee) throw new HttpException(400, 'Employee not found')
+    if (!employee) throw new NotFoundException()
 
     const loginStatus = await bcrypt.compare(
       loginDto.password,
