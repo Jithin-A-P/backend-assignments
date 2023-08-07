@@ -13,6 +13,7 @@ import EmployeeDto from '../../dto/employee.dto'
 import bcrypt from 'bcrypt'
 import HttpException from '../../exception/http.exception'
 import LoginDto from '../../dto/login.dto'
+import EditEmployeeDto from '../../dto/edit-employee.dto'
 
 describe('Employee Service Tests', () => {
   let employeeRepository: EmployeeRepository
@@ -108,6 +109,80 @@ describe('Employee Service Tests', () => {
       }) as Employee
       const newEmployee = await employeeService.addEmployee(employee)
       expect(newEmployee).toStrictEqual({ id: 1 })
+    })
+  })
+
+  describe('Tests for editEmployee', () => {
+    test('Success case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue({
+        id: 1,
+        name: 'Name'
+      })
+      employeeRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((employee) => {})
+      employeeRepository.update = mockUpdate
+
+      const editEmployeeDto = plainToInstance(EditEmployeeDto, {
+        name: 'new Name',
+      })
+
+      expect(
+        async () =>
+          await employeeService.editEmployee(
+            1,
+            editEmployeeDto
+          )
+      ).not.toThrowError()
+    })
+
+    test('Failure case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue({
+        id: 1,
+        name: 'Name'
+      })
+      employeeRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((employee) => {})
+      employeeRepository.update = mockUpdate
+
+      const editEmployeeDto = plainToInstance(EditEmployeeDto, {
+        name2: 'new Name',
+      })
+
+      expect(
+        async () =>
+          await employeeService.editEmployee(
+            1,
+            editEmployeeDto
+          )
+      ).rejects.toThrowError()
+    })
+
+    test('Not found case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue(null)
+      employeeRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((employee) => {})
+      employeeRepository.update = mockUpdate
+
+      const editEmployeeDto = plainToInstance(EditEmployeeDto, {
+        name2: 'new Name',
+      })
+
+      expect(
+        async () =>
+          await employeeService.editEmployee(
+            1,
+            editEmployeeDto
+          )
+      ).rejects.toThrowError()
     })
   })
 

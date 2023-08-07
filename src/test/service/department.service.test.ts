@@ -6,6 +6,7 @@ import HttpException from '../../exception/http.exception'
 import { when } from 'jest-when'
 import { plainToInstance } from 'class-transformer'
 import DepartmentDto from '../../dto/department.dto'
+import EditDepartmentDto from '../../dto/edit-department.dto'
 
 describe('Department Service Tests', () => {
   let departmentService: DepartmentService
@@ -102,6 +103,57 @@ describe('Department Service Tests', () => {
             updateDepartmentDto as Department
           )
       ).not.toThrowError()
+    })
+  })
+
+  describe('Tests for editDepartment', () => {
+    test('Success case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue({
+        id: 1,
+        name: 'Name'
+      })
+      departmentRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((dept) => {})
+      departmentRepository.update = mockUpdate
+
+      const editDepartmentDto = plainToInstance(EditDepartmentDto, {
+        name: 'Dept',
+      })
+
+      expect(
+        async () =>
+          await departmentService.editDepartment(
+            1,
+            editDepartmentDto
+          )
+      ).not.toThrowError()
+    })
+    test('Success case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue({
+        id: 1,
+        name: 'Name'
+      })
+      departmentRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((dept) => {})
+      departmentRepository.update = mockUpdate
+
+      const editDepartmentDto = plainToInstance(EditDepartmentDto, {
+        name1: 'Dept',
+      })
+
+      expect(
+        async () =>
+          await departmentService.editDepartment(
+            1,
+            editDepartmentDto
+          )
+      ).rejects.toThrowError()
     })
   })
 

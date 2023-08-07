@@ -27,13 +27,13 @@ class DepartmentService {
     editDepartmentDto: EditDepartmentDto
   ): Promise<Department> => {
     const department = await this.departmentRepository.findById(id)
+    if (!department) throw new NotFoundException()
     for(const k in editDepartmentDto) 
       if(!(k in department)) throw new HttpException(400, 'Bad Request')
     const editedDepartment = await this.departmentRepository.update({
       ...department,
       ...editDepartmentDto,
     })
-    if (!department) throw new NotFoundException()
     return editedDepartment
   }
 
