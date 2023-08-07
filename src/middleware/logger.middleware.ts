@@ -6,9 +6,8 @@ const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   res.locals.traceId = randomUUID()
   logger.log({
     level: 'info',
-    timeStamp: new Date(),
     traceId: res.locals.traceId,
-    message: `${req.url} : ${req.method}`,
+    message: `${res.locals.traceId} : ${req.url} : ${req.method}`,
   })
   next()
 }

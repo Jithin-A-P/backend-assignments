@@ -13,9 +13,7 @@ const errorMiddleware = (
   try {
     logger.log({
       level: 'error',
-      timeStamp: new Date(),
-      traceId: res.locals.traceId,
-      message: error.message,
+      message: `${res.locals.traceId} : ${error.message}`,
     })
     console.log(error.stack)
     if (error instanceof ValidationException) {

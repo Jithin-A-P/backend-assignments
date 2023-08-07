@@ -13,12 +13,12 @@ class RoleController {
   private getRoles = (req: Request, res: Response, next: NextFunction) => {
     try {
       const startTime = new Date().getTime()
-      res.status(200)
       res.locals = {
         data: Object.values(Role),
         errors: null,
         startTime: startTime
       }
+      res.status(200)
       next()
     } catch (error) {
       next(error)
