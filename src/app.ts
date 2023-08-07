@@ -10,6 +10,7 @@ import errorMiddleware from './middleware/error.middleware'
 import roleRoute from './routes/role.route'
 import departmentRoute from './routes/department.route'
 import jsonFormatter from './middleware/jsonformatter.middleware'
+import logger from './utils/winston.logger'
 
 const server = express()
 const PORT = process.env.PORT
@@ -27,8 +28,10 @@ dataSource
   .then(() => {
     server.listen(PORT, () => {
       console.log(`Server started on port : ${PORT}`)
+      logger.log({level: 'error', message:`Server started on port : ${PORT}`})
     })
   })
   .catch((err: Error) => {
     console.log("Error, can't connect to db : ", err)
+    logger.log({level: 'error', message:`Error, can't connect to db ${err}`})
   })
