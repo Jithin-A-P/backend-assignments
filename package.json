@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "jest",
-    "test-coverage": "jest --coverage",
+    "test": "jest --verbose --setupFiles dotenv/config",
+    "test-coverage": "jest --coverage --setupFiles dotenv/config",
     "start-server": "node dist/app.js",
     "build": "rm -rf dist && npx tsc && cp .env dist/.env",
     "dev": "npm run build && npm run start-server",
