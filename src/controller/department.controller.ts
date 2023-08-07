@@ -8,6 +8,7 @@ import DepartmentDto from '../dto/department.dto'
 import { validate } from 'class-validator'
 import ValidationException from '../exception/validation.exception'
 import Department from '../entity/department.entity'
+import EditDepartmentDto from '../dto/edit-department.dto'
 
 class DepartmentController {
   public router: Router
@@ -26,6 +27,12 @@ class DepartmentController {
       autheticate,
       authorize([Role.ADMIN, Role.HR]),
       this.updateDepartmentById
+    )
+    this.router.patch(
+      '/:id',
+      autheticate,
+      authorize([Role.HR, Role.ADMIN]),
+      this.editDepartmentById
     )
     this.router.delete(
       '/:id',
@@ -77,6 +84,34 @@ class DepartmentController {
       next(error)
     }
   }
+
+  private editDepartmentById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const startTime = new Date().getTime()
+      const departmentId = Number(req.params.id)
+      const editDepartmentDto = plainToInstance(EditDepartmentDto, req.body)
+      const errors = await validate(editDepartmentDto)
+      if (errors.length > 0) throw new ValidationException(errors)
+      const department = await this.departmentService.editDepartment(
+        departmentId,
+        editDepartmentDto
+      )
+      res.status(200)
+      res.locals = {
+        data: department,
+        errors: null,
+        startTime: startTime,
+      }
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
 
   private addDepartment = async (
     req: Request,

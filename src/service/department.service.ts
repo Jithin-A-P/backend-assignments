@@ -1,3 +1,4 @@
+import EditDepartmentDto from '../dto/edit-department.dto'
 import Department from '../entity/department.entity'
 import HttpException from '../exception/http.exception'
 import NotFoundException from '../exception/not-found.exception'
@@ -19,6 +20,21 @@ class DepartmentService {
     if(!department)
       throw new NotFoundException()
     return department
+  }
+
+  public editDepartment = async (
+    id: number,
+    editDepartmentDto: EditDepartmentDto
+  ): Promise<Department> => {
+    const department = await this.departmentRepository.findById(id)
+    for(const k in editDepartmentDto) 
+      if(!(k in department)) throw new HttpException(400, 'Bad Request')
+    const editedDepartment = await this.departmentRepository.update({
+      ...department,
+      ...editDepartmentDto,
+    })
+    if (!department) throw new NotFoundException()
+    return editedDepartment
   }
 
   public removeDepartmentById = async (id: number): Promise<Department> => {

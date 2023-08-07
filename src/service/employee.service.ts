@@ -5,6 +5,7 @@ import HttpException from '../exception/http.exception'
 import EmployeeRepository from '../repository/employee.repository'
 import LoginDto from '../dto/login.dto'
 import NotFoundException from '../exception/not-found.exception'
+import EditEmployeeDto from '../dto/edit-employee.dto'
 
 class EmployeeService {
   constructor(private employeeRepository: EmployeeRepository) {}
@@ -15,9 +16,23 @@ class EmployeeService {
 
   public getEmployeeById = async (id: number): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
-    if (!employee)
-      throw new NotFoundException()
+    if (!employee) throw new NotFoundException()
     return employee
+  }
+
+  public editEmployee = async (
+    id: number,
+    editEmployeeDto: EditEmployeeDto
+  ): Promise<Employee> => {
+    const employee = await this.employeeRepository.findById(id)
+    for(const k in editEmployeeDto) 
+      if(!(k in employee)) throw new HttpException(400, 'Bad Request')
+    const editedEmployee = await this.employeeRepository.update({
+      ...employee,
+      ...editEmployeeDto,
+    })
+    if (!employee) throw new NotFoundException()
+    return editedEmployee
   }
 
   public removeEmployeeById = async (id: number): Promise<Employee> => {
@@ -33,12 +48,9 @@ class EmployeeService {
     return this.employeeRepository.add(newEmployee)
   }
 
-  public updateEmployee = async (
-    employeeDto: Employee
-  ): Promise<Employee> => {
+  public updateEmployee = async (employeeDto: Employee): Promise<Employee> => {
     const employee = await this.getEmployeeById(employeeDto.id)
-    if (!employee)
-      throw new NotFoundException()
+    if (!employee) throw new NotFoundException()
     const updatedAddress = employeeDto.address
     return this.employeeRepository.update({
       ...employee,
@@ -68,11 +80,9 @@ class EmployeeService {
       role: employee.role,
     }
 
-    const token = jsonwebtoken.sign(
-      payload, 
-      process.env.JWT_SECRETE_KEY, 
-      { expiresIn: process.env.JWT_EXPIRY_TIME }
-    )
+    const token = jsonwebtoken.sign(payload, process.env.JWT_SECRETE_KEY, {
+      expiresIn: process.env.JWT_EXPIRY_TIME,
+    })
 
     return { token: token }
   }

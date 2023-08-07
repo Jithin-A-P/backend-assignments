@@ -9,6 +9,7 @@ import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import Employee from '../entity/employee.entity'
 import LoginDto from '../dto/login.dto'
+import EditEmployeeDto from '../dto/edit-employee.dto'
 
 class EmployeeController {
   public router: Router
@@ -27,6 +28,12 @@ class EmployeeController {
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
       this.updateEmployeeById
+    )
+    this.router.patch(
+      '/:id',
+      autheticate,
+      authorize([Role.HR, Role.ADMIN]),
+      this.editEmployeeById
     )
     this.router.delete(
       '/:id',
@@ -54,7 +61,7 @@ class EmployeeController {
       res.locals = {
         data: addedEmployee,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -74,7 +81,7 @@ class EmployeeController {
       res.locals = {
         data: employees,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -95,7 +102,34 @@ class EmployeeController {
       res.locals = {
         data: employee,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
+      }
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  private editEmployeeById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const startTime = new Date().getTime()
+      const employeeId = Number(req.params.id)
+      const editEmployeeDto = plainToInstance(EditEmployeeDto, req.body)
+      const errors = await validate(editEmployeeDto)
+      if (errors.length > 0) throw new ValidationException(errors)
+      const employee = await this.employeeService.editEmployee(
+        employeeId,
+        editEmployeeDto
+      )
+      res.status(200)
+      res.locals = {
+        data: employee,
+        errors: null,
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -123,7 +157,7 @@ class EmployeeController {
       res.locals = {
         data: updatedEmployee,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -161,7 +195,7 @@ class EmployeeController {
       res.locals = {
         data: token,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
