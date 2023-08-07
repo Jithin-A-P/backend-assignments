@@ -8,6 +8,7 @@ class EmployeeRepository {
     return this.employeeRepository.find({
       relations: {
         address: true,
+        department: true
       },
     })
   }

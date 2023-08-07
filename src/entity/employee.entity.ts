@@ -28,8 +28,12 @@ class Employee extends AbstractEntity {
   @Column({ default: Status.ACTIVE })
   status: Status
 
+  @Column({ name: 'department_id' })
+  departmentId: number
+
   @ManyToOne(() => Department, (department) => department.employees)
-  department: number
+  @JoinColumn({ name: 'department_id' })
+  department: Department
 
   @OneToOne(() => Address, (address) => address.employee, { cascade: true })
   address: Address

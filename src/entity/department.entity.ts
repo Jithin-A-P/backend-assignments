@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from 'typeorm'
+import { Column, Entity, JoinColumn, OneToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Employee from './employee.entity'
 

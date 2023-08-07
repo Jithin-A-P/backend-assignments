@@ -44,7 +44,7 @@ class EmployeeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  department: number
+  departmentId: number
 
   @IsNotEmpty()
   @IsObject()
