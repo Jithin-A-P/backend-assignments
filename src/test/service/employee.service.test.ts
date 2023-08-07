@@ -10,10 +10,12 @@ import Role from '../../utils/role.enum'
 import Address from '../../entity/address.entity'
 import { plainToInstance } from 'class-transformer'
 import EmployeeDto from '../../dto/employee.dto'
-import bcrypt from 'bcrypt'
 import HttpException from '../../exception/http.exception'
 import LoginDto from '../../dto/login.dto'
 import EditEmployeeDto from '../../dto/edit-employee.dto'
+import NotFoundException from '../../exception/not-found.exception'
+import jsonwebtoken from 'jsonwebtoken'
+import bcrypt, { hash } from 'bcrypt'
 
 describe('Employee Service Tests', () => {
   let employeeRepository: EmployeeRepository
@@ -29,7 +31,7 @@ describe('Employee Service Tests', () => {
   })
 
   describe('Test for getEmployeeById', () => {
-    test('Test employee for id 1', async () => {
+    test('Success Case', async () => {
       const mockEmployee: Employee = {
         id: 20,
         createdAt: new Date('2023-08-04T03:13:09.449Z'),
@@ -58,12 +60,35 @@ describe('Employee Service Tests', () => {
       const employee = await employeeService.getEmployeeById(1)
       expect(employee).toMatchObject(mockEmployee)
     })
-    test('Test employee for id 1', async () => {
+
+    test('Failure Case', async () => {
+      const mockEmployee: Employee = {
+        id: 20,
+        createdAt: new Date('2023-08-04T03:13:09.449Z'),
+        updatedAt: new Date('2023-08-04T03:13:09.449Z'),
+        deletedAt: null,
+        name: 'John Newman',
+        email: 'john@mail.com',
+        age: null,
+        password:
+          '$2b$10$V3PqZiOnyewT/Y6ai8Q9QeHv1A7TVe1pUQE0PQocDNKpSlBnrvAN.',
+        role: Role.UI,
+        address: {
+          id: 19,
+          createdAt: new Date('2023-08-04T03:13:09.449Z'),
+          updatedAt: new Date('2023-08-04T03:13:09.449Z'),
+          deletedAt: null,
+          line1: 'adress line one',
+          line2: null,
+          pincode: '686691',
+        } as unknown as Address,
+      } as unknown as Employee
+
       const mockFunction = jest.fn()
       when(mockFunction).calledWith(1).mockResolvedValueOnce(null)
       employeeRepository.findById = mockFunction
       const employee = async () => await employeeService.getEmployeeById(1)
-      expect(employee).rejects.toThrowError()
+      expect(employee).rejects.toThrowError(NotFoundException)
     })
   })
 
@@ -85,10 +110,10 @@ describe('Employee Service Tests', () => {
     })
   })
 
-  describe('Test for createEmployee', () => {
+  describe('Test for addEmployee', () => {
     test('Success case', async () => {
       const mockAddFunction = jest.fn()
-      mockAddFunction.mockResolvedValueOnce({ id: 1 })
+      mockAddFunction.mockResolvedValueOnce({ id: 1, name: "Name" })
       employeeRepository.add = mockAddFunction
 
       const employee = plainToInstance(EmployeeDto, {
@@ -108,7 +133,7 @@ describe('Employee Service Tests', () => {
         departmentId: 1,
       }) as Employee
       const newEmployee = await employeeService.addEmployee(employee)
-      expect(newEmployee).toStrictEqual({ id: 1 })
+      expect(newEmployee).toStrictEqual({ id: 1, name: "Name" })
     })
   })
 
@@ -121,9 +146,9 @@ describe('Employee Service Tests', () => {
       })
       employeeRepository.findById = mockFindById
 
-      const mockUpdate = jest.fn()
-      mockUpdate.mockImplementation((employee) => {})
-      employeeRepository.update = mockUpdate
+      const mockUpdateEmployee = jest.fn()
+      mockUpdateEmployee.mockResolvedValueOnce({ id: 1, name: 'Name' })
+      employeeRepository.update = mockUpdateEmployee
 
       const editEmployeeDto = plainToInstance(EditEmployeeDto, {
         name: 'new Name',
@@ -146,12 +171,13 @@ describe('Employee Service Tests', () => {
       })
       employeeRepository.findById = mockFindById
 
-      const mockUpdate = jest.fn()
-      mockUpdate.mockImplementation((employee) => {})
-      employeeRepository.update = mockUpdate
+      const mockUpdateEmployee = jest.fn()
+      mockUpdateEmployee.mockResolvedValueOnce({ id: 1 })
+      employeeRepository.update = mockUpdateEmployee
 
       const editEmployeeDto = plainToInstance(EditEmployeeDto, {
-        name2: 'new Name',
+        name1: 'new Name',
+        name: 'New Name'
       })
 
       expect(
@@ -168,14 +194,34 @@ describe('Employee Service Tests', () => {
       when(mockFindById).calledWith(1).mockResolvedValue(null)
       employeeRepository.findById = mockFindById
 
-      const mockUpdate = jest.fn()
-      mockUpdate.mockImplementation((employee) => {})
-      employeeRepository.update = mockUpdate
+      const mockUpdateEmployee = jest.fn()
+      mockUpdateEmployee.mockResolvedValueOnce({})
+      employeeRepository.update = mockUpdateEmployee
 
       const editEmployeeDto = plainToInstance(EditEmployeeDto, {
-        name2: 'new Name',
+        name: 'new Name',
       })
+      expect(
+        async () =>
+          await employeeService.editEmployee(
+            1,
+            editEmployeeDto
+          )
+      ).rejects.toThrowError()
+    })
 
+    test('Not found case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue({})
+      employeeRepository.findById = mockFindById
+
+      const mockUpdateEmployee = jest.fn()
+      mockUpdateEmployee.mockResolvedValueOnce(null)
+      employeeRepository.update = mockUpdateEmployee
+
+      const editEmployeeDto = plainToInstance(EditEmployeeDto, {
+        name: 'new Name',
+      })
       expect(
         async () =>
           await employeeService.editEmployee(
@@ -203,11 +249,51 @@ describe('Employee Service Tests', () => {
       when(mockFunction).calledWith(body.email).mockResolvedValueOnce(employee)
       employeeRepository.findByEmail = mockFunction
 
+      const mockFunction2 = jest.fn()
+      mockFunction2.mockResolvedValueOnce(true)
+      bcrypt.compare = mockFunction2
+
+      const mockFunction3 = jest.fn()
+      mockFunction3.mockResolvedValueOnce('salkfdjlksjdf')
+      jsonwebtoken.sign = mockFunction3
+
       const token = await employeeService.loginEmployee(
         plainToInstance(LoginDto, body)
       )
       expect(token).toBeDefined()
     })
+
+    test('Failure case', async () => {
+      const body = {
+        email: 'mail@mail.com',
+        password: 'password',
+      }
+      const employee = {
+        name: 'name',
+        email: 'mail@mail.com',
+        role: Role.ADMIN,
+        password: await bcrypt.hash('password', 10),
+      } as Employee
+
+      const mockFunction = jest.fn()
+      when(mockFunction).calledWith(body.email).mockResolvedValueOnce(null)
+      employeeRepository.findByEmail = mockFunction
+      
+      const mockFunction2 = jest.fn()
+      mockFunction2.mockResolvedValueOnce(false)
+      bcrypt.compare = mockFunction2
+
+      const mockFunction3 = jest.fn()
+      mockFunction3.mockResolvedValueOnce('salkfdjlksjdf')
+      jsonwebtoken.sign = mockFunction3
+
+      const token = async () => await employeeService.loginEmployee(
+        plainToInstance(LoginDto, body)
+      )
+      expect(token).rejects.toThrowError()
+    })
+
+    
 
     test('Failure case for invalid username', async () => {
       const body = {
@@ -215,8 +301,17 @@ describe('Employee Service Tests', () => {
         password: 'password',
       }
       const mockFunction = jest.fn()
-      when(mockFunction).calledWith(body.email).mockResolvedValueOnce(null)
+      when(mockFunction).calledWith(body.email).mockResolvedValueOnce({})
       employeeRepository.findByEmail = mockFunction
+
+      const mockFunction2 = jest.fn()
+      mockFunction2.mockResolvedValueOnce(false)
+      bcrypt.compare = mockFunction2
+
+      const mockFunction3 = jest.fn()
+      mockFunction3.mockResolvedValueOnce('salkfdjlksjdf')
+      jsonwebtoken.sign = mockFunction3
+
       expect(
         async () =>
           await employeeService.loginEmployee(plainToInstance(LoginDto, body))
@@ -239,6 +334,14 @@ describe('Employee Service Tests', () => {
       const mockFunction = jest.fn()
       when(mockFunction).calledWith(body.emial).mockResolvedValueOnce(employee)
       employeeRepository.findByEmail = mockFunction
+
+      const mockFunction2 = jest.fn()
+      mockFunction2.mockResolvedValueOnce(true)
+      bcrypt.compare = mockFunction2
+
+      const mockFunction3 = jest.fn()
+      mockFunction3.mockResolvedValueOnce('salkfdjlksjdf')
+      jsonwebtoken.sign = mockFunction3
 
       expect(
         async () =>
@@ -273,7 +376,7 @@ describe('Employee Service Tests', () => {
 
       const mockFindById = jest.fn()
       when(mockFindById).calledWith(1).mockResolvedValueOnce(mockEmployee)
-      employeeRepository.findById = mockFindById
+      employeeService.getEmployeeById = mockFindById
 
       const mockUpdateEmployee = jest.fn()
       mockUpdateEmployee.mockResolvedValueOnce({ id: 1, username: 'name' })
@@ -285,19 +388,76 @@ describe('Employee Service Tests', () => {
           await employeeService.updateEmployee(updateEmployeeDto as Employee)
       ).not.toThrowError(HttpException)
     })
+
+    test('Failure case', async () => {
+      const mockEmployee: Employee = {
+        id: 1,
+        createdAt: new Date('2023-08-04T03:13:09.449Z'),
+        updatedAt: new Date('2023-08-04T03:13:09.449Z'),
+        deletedAt: null,
+        name: 'John Newman',
+        email: 'john@mail.com',
+        age: null,
+        password: 'pass',
+        role: Role.UI,
+        address: {
+          id: 19,
+          createdAt: new Date('2023-08-04T03:13:09.449Z'),
+          updatedAt: new Date('2023-08-04T03:13:09.449Z'),
+          deletedAt: null,
+          line1: 'adress line one',
+          line2: null,
+          pincode: '686691',
+        } as unknown as Address,
+      } as unknown as Employee
+
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValueOnce(null)
+      employeeService.getEmployeeById = mockFindById
+
+      const mockUpdateEmployee = jest.fn()
+      mockUpdateEmployee.mockResolvedValueOnce({
+        id: 1,
+        createdAt: new Date('2023-08-04T03:13:09.449Z'),
+        updatedAt: new Date('2023-08-04T03:13:09.449Z'),
+        deletedAt: null,
+        name: 'John Newman',
+        email: 'john@mail.com',
+        age: null,
+        password:
+          '$2b$10$V3PqZiOnyewT/Y6ai8Q9QeHv1A7TVe1pUQE0PQocDNKpSlBnrvAN.',
+        role: Role.UI,
+        address: {
+          id: 19,
+          createdAt: new Date('2023-08-04T03:13:09.449Z'),
+          updatedAt: new Date('2023-08-04T03:13:09.449Z'),
+          deletedAt: null,
+          line1: 'adress line one',
+          line2: null,
+          pincode: '686691',
+        } as unknown as Address,
+      } as unknown as Employee)
+      employeeRepository.update = mockUpdateEmployee
+
+      const updateEmployeeDto = plainToInstance(EmployeeDto, mockEmployee)
+      expect(
+        async () =>
+          await employeeService.updateEmployee(updateEmployeeDto as Employee)
+      ).rejects.toThrowError()
+    })
   })
 
   describe('Test for removeEmployee', () => {
     test('Success case', async () => {
       const mockGetEmployee = jest.fn()
-      when(mockGetEmployee).calledWith(1).mockResolvedValueOnce(new Employee())
-      employeeService.getEmployeeById = mockGetEmployee
+      when(mockGetEmployee).calledWith(1).mockResolvedValueOnce({ id: 1, username: 'name' })
+      employeeRepository.findById = mockGetEmployee
 
       const mockRemove = jest.fn()
-      mockRemove.mockImplementation((employee) => {})
+      mockRemove.mockResolvedValueOnce({ id: 1, username: 'name' })
       employeeRepository.remove = mockRemove
 
-      expect(employeeService.removeEmployeeById(1)).resolves.not.toThrowError()
+      expect(async () => await employeeService.removeEmployeeById(1)).not.toThrowError()
     })
   })
 })

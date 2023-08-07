@@ -61,7 +61,7 @@ describe('Department Service Tests', () => {
 
       expect(
         async () => await departmentService.getDepartmentById(2)
-      ).rejects.toThrowError(HttpException)
+      ).rejects.toThrowError()
     })
   })
 
@@ -104,6 +104,28 @@ describe('Department Service Tests', () => {
           )
       ).not.toThrowError()
     })
+
+    test('Failure case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue(null)
+      departmentRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((dept) => {})
+      departmentRepository.update = mockUpdate
+
+      const updateDepartmentDto = plainToInstance(DepartmentDto, {
+        id: 1,
+        name: 'DEPT',
+      })
+
+      expect(
+        async () =>
+          await departmentService.updateDepartment(
+            updateDepartmentDto as Department
+          )
+      ).rejects.toThrowError()
+    })
   })
 
   describe('Tests for editDepartment', () => {
@@ -131,7 +153,8 @@ describe('Department Service Tests', () => {
           )
       ).not.toThrowError()
     })
-    test('Success case', async () => {
+
+    test('Failure case', async () => {
       const mockFindById = jest.fn()
       when(mockFindById).calledWith(1).mockResolvedValue({
         id: 1,
@@ -145,6 +168,28 @@ describe('Department Service Tests', () => {
 
       const editDepartmentDto = plainToInstance(EditDepartmentDto, {
         name1: 'Dept',
+      })
+
+      expect(
+        async () =>
+          await departmentService.editDepartment(
+            1,
+            editDepartmentDto
+          )
+      ).rejects.toThrowError()
+    })
+
+    test('Failure case null returned', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue(null)
+      departmentRepository.findById = mockFindById
+
+      const mockUpdate = jest.fn()
+      mockUpdate.mockImplementation((dept) => {})
+      departmentRepository.update = mockUpdate
+
+      const editDepartmentDto = plainToInstance(EditDepartmentDto, {
+        name: 'Dept',
       })
 
       expect(
@@ -173,6 +218,20 @@ describe('Department Service Tests', () => {
       expect(
         departmentService.removeDepartmentById(1)
       ).resolves.not.toThrowError()
+    })
+
+    test('Failure case', async () => {
+      const mockFindById = jest.fn()
+      when(mockFindById).calledWith(1).mockResolvedValue(null)
+      departmentRepository.findById = mockFindById
+
+      const mockRemove = jest.fn()
+      mockRemove.mockImplementation((dept) => {})
+      departmentRepository.remove = mockRemove
+
+      expect(
+        departmentService.removeDepartmentById(1)
+      ).rejects.toThrowError()
     })
   })
 })

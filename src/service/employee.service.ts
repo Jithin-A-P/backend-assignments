@@ -25,13 +25,13 @@ class EmployeeService {
     editEmployeeDto: EditEmployeeDto
   ): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
+    if (!employee) throw new NotFoundException()
     for(const k in editEmployeeDto) 
       if(!(k in employee)) throw new HttpException(400, 'Bad Request')
     const editedEmployee = await this.employeeRepository.update({
       ...employee,
       ...editEmployeeDto,
     })
-    if (!employee) throw new NotFoundException()
     return editedEmployee
   }
 
@@ -71,6 +71,7 @@ class EmployeeService {
       loginDto.password,
       employee.password
     )
+
     if (!loginStatus)
       throw new HttpException(401, 'Incorrect username or password')
 
