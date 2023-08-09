@@ -15,7 +15,6 @@ const errorMiddleware = (
       level: 'error',
       message: `${res.locals.traceId} : ${error.message}`,
     })
-    console.log(error.stack)
     res.status(500)
     res.statusMessage = HttpStatusMessages['CODE_500']
     if (error instanceof ValidationException) {

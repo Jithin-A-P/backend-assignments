@@ -17,8 +17,8 @@ class DepartmentService {
 
   public getDepartmentById = async (id: number): Promise<Department> => {
     const department = await this.departmentRepository.findById(id)
-    if(!department)
-      throw new NotFoundException()
+    if (!department)
+      throw new NotFoundException(`Department not found with id: ${id}`)
     return department
   }
 
@@ -27,9 +27,10 @@ class DepartmentService {
     editDepartmentDto: EditDepartmentDto
   ): Promise<Department> => {
     const department = await this.departmentRepository.findById(id)
-    if (!department) throw new NotFoundException()
-    for(const k in editDepartmentDto) 
-      if(!(k in department)) throw new HttpException(400, 'Bad Request')
+    if (!department)
+      throw new NotFoundException(`Department not found with id: ${id}`)
+    for (const k in editDepartmentDto)
+      if (!(k in department)) throw new HttpException(400, 'Bad Request')
     const editedDepartment = await this.departmentRepository.update({
       ...department,
       ...editDepartmentDto,
@@ -38,19 +39,25 @@ class DepartmentService {
   }
 
   public removeDepartmentById = async (id: number): Promise<Department> => {
-    const department = await this.departmentRepository.findById(id)
-    if(!department)
-      throw new NotFoundException
+    const department = await this.departmentRepository.findByIdWithEmployees(id)
+    if (!department)
+      throw new NotFoundException(`Department not found with id: ${id}`)
+    if (department.employees.length > 0)
+      throw new HttpException(400, 'Cannot delete department with employees')
+    console.log(department.employees)
     return this.departmentRepository.remove(department)
   }
 
-  public updateDepartment = async (departmentDto: Department): Promise<Department> => {
-    const department = await this.departmentRepository.findById(departmentDto.id)
-    if(!department)
-      throw new NotFoundException
+  public updateDepartment = async (
+    departmentDto: Department,
+    id: number
+  ): Promise<Department> => {
+    const department = await this.departmentRepository.findById(id)
+    if (!department)
+      throw new NotFoundException(`Department not found with id: ${id}`)
     return this.departmentRepository.update({
       ...department,
-      ...departmentDto
+      ...departmentDto,
     })
   }
 }

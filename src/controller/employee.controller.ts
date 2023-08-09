@@ -10,6 +10,7 @@ import Role from '../utils/role.enum'
 import Employee from '../entity/employee.entity'
 import LoginDto from '../dto/login.dto'
 import EditEmployeeDto from '../dto/edit-employee.dto'
+import HttpException from '../exception/http.exception'
 
 class EmployeeController {
   public router: Router
@@ -97,6 +98,8 @@ class EmployeeController {
     try {
       const startTime = new Date().getTime()
       const employeeId = Number(req.params.id)
+      if (!Number.isInteger(employeeId))
+        throw new HttpException(400, 'Bad Request, invalid employee URL')
       const employee = await this.employeeService.getEmployeeById(employeeId)
       res.status(200)
       res.locals = {
@@ -118,6 +121,8 @@ class EmployeeController {
     try {
       const startTime = new Date().getTime()
       const employeeId = Number(req.params.id)
+      if (!Number.isInteger(employeeId))
+        throw new HttpException(400, 'Bad Request, invalid employee URL')
       const editEmployeeDto = plainToInstance(EditEmployeeDto, req.body)
       const errors = await validate(editEmployeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
@@ -144,14 +149,15 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
-      const employeeDto = plainToInstance(EmployeeDto, {
-        ...req.body,
-        id: parseInt(req.params.id),
-      })
+      const employeeId = Number(req.params.id)
+      if (!Number.isInteger(employeeId))
+        throw new HttpException(400, 'Bad Request, invalid employee URL')
+      const employeeDto = plainToInstance(EmployeeDto, req.body)
       const errors = await validate(employeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
       const updatedEmployee = await this.employeeService.updateEmployee(
-        employeeDto as Employee
+        employeeDto as Employee,
+        employeeId
       )
       res.status(200)
       res.locals = {
@@ -172,6 +178,8 @@ class EmployeeController {
   ) => {
     try {
       const employeeId = Number(req.params.id)
+      if (!Number.isInteger(employeeId))
+        throw new HttpException(400, 'Bad Request, invalid employee URL')
       await this.employeeService.removeEmployeeById(employeeId)
       res.status(204)
       next()

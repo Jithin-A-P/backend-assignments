@@ -9,6 +9,7 @@ import { validate } from 'class-validator'
 import ValidationException from '../exception/validation.exception'
 import Department from '../entity/department.entity'
 import EditDepartmentDto from '../dto/edit-department.dto'
+import HttpException from '../exception/http.exception'
 
 class DepartmentController {
   public router: Router
@@ -54,7 +55,7 @@ class DepartmentController {
       res.locals = {
         data: departments,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -70,6 +71,8 @@ class DepartmentController {
     try {
       const startTime = new Date().getTime()
       const departmentId = Number(req.params.id)
+      if (!Number.isInteger(departmentId))
+        throw new HttpException(400, 'Bad Request, invalid department URL')
       const department = await this.departmentService.getDepartmentById(
         departmentId
       )
@@ -77,7 +80,7 @@ class DepartmentController {
       res.locals = {
         data: department,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -93,6 +96,8 @@ class DepartmentController {
     try {
       const startTime = new Date().getTime()
       const departmentId = Number(req.params.id)
+      if (!Number.isInteger(departmentId))
+        throw new HttpException(400, 'Bad Request, invalid department URL')
       const editDepartmentDto = plainToInstance(EditDepartmentDto, req.body)
       const errors = await validate(editDepartmentDto)
       if (errors.length > 0) throw new ValidationException(errors)
@@ -112,7 +117,6 @@ class DepartmentController {
     }
   }
 
-
   private addDepartment = async (
     req: Request,
     res: Response,
@@ -130,7 +134,7 @@ class DepartmentController {
       res.locals = {
         data: addedDepartment,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -145,17 +149,21 @@ class DepartmentController {
   ) => {
     try {
       const startTime = new Date().getTime()
+      const departmentId = Number(req.params.id)
+      if (!Number.isInteger(departmentId))
+        throw new HttpException(400, 'Bad Request, invalid department URL')
       const departmentDto = plainToInstance(DepartmentDto, req.body)
       const errors = await validate(departmentDto)
       if (errors.length > 0) throw new ValidationException(errors)
       const updatedDepartment = await this.departmentService.updateDepartment(
-        departmentDto as Department
+        departmentDto as Department,
+        departmentId
       )
       res.status(200)
       res.locals = {
         data: updatedDepartment,
         errors: null,
-        startTime: startTime
+        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -169,8 +177,10 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const employeeId = Number(req.params.id)
-      await this.departmentService.removeDepartmentById(employeeId)
+      const departmentId = Number(req.params.id)
+      if (!Number.isInteger(departmentId))
+        throw new HttpException(400, 'Bad Request, invalid department URL')
+      await this.departmentService.removeDepartmentById(departmentId)
       res.status(204)
       next()
     } catch (error) {

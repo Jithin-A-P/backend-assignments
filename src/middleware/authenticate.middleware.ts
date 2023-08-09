@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import jsonwebtoken from 'jsonwebtoken'
 import JwtPayload from '../utils/jwt-payload.type'
 import RequestWithUser from '../utils/request-with-user.interface'
+import HttpException from '../exception/http.exception'
 
 const autheticate = async (
   req: RequestWithUser,
@@ -19,6 +20,8 @@ const autheticate = async (
     req.role = payload.role
     next()
   } catch (error) {
+    if(error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError')
+      next(new HttpException(403, 'You are not authorized to perform this action'))
     next(error)
   }
 }

@@ -1,9 +1,8 @@
-import HttpStatusMessages from "../utils/http-status-messages"
-import HttpException from "./http.exception"
+import HttpException from './http.exception'
 
 class NotFoundException extends HttpException {
-  constructor() {
-    super(404, HttpStatusMessages['CODE_404'])
+  constructor(message: string) {
+    super(404, message)
   }
 }
 

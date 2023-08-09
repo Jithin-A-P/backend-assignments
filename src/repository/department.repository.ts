@@ -14,6 +14,15 @@ class DepartmentRepository {
     })
   }
 
+  public findByIdWithEmployees = (id: number): Promise<Department> => {
+    return this.departmentRepositroy.findOne({
+      where: { id: id },
+      relations: {
+        employees: true
+      }
+    })
+  }
+
   public add = (department: Department) => {
     return this.departmentRepositroy.save(department)
   }

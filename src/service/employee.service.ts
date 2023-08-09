@@ -16,7 +16,8 @@ class EmployeeService {
 
   public getEmployeeById = async (id: number): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
-    if (!employee) throw new NotFoundException()
+    if (!employee)
+      throw new NotFoundException(`Employee not found with id: ${id}`)
     return employee
   }
 
@@ -25,9 +26,10 @@ class EmployeeService {
     editEmployeeDto: EditEmployeeDto
   ): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
-    if (!employee) throw new NotFoundException()
-    for(const k in editEmployeeDto) 
-      if(!(k in employee)) throw new HttpException(400, 'Bad Request')
+    if (!employee)
+      throw new NotFoundException(`Employee not found with id: ${id}`)
+    for (const k in editEmployeeDto)
+      if (!(k in employee)) throw new HttpException(400, 'Bad Request')
     const editedEmployee = await this.employeeRepository.update({
       ...employee,
       ...editEmployeeDto,
@@ -48,9 +50,13 @@ class EmployeeService {
     return this.employeeRepository.add(newEmployee)
   }
 
-  public updateEmployee = async (employeeDto: Employee): Promise<Employee> => {
-    const employee = await this.getEmployeeById(employeeDto.id)
-    if (!employee) throw new NotFoundException()
+  public updateEmployee = async (
+    employeeDto: Employee,
+    id: number
+  ): Promise<Employee> => {
+    const employee = await this.getEmployeeById(id)
+    if (!employee)
+      throw new NotFoundException(`Employee not found with id: ${id}`)
     const updatedAddress = employeeDto.address
     return this.employeeRepository.update({
       ...employee,
@@ -65,7 +71,8 @@ class EmployeeService {
 
   public loginEmployee = async (loginDto: LoginDto) => {
     const employee = await this.employeeRepository.findByEmail(loginDto.email)
-    if (!employee) throw new NotFoundException()
+    if (!employee)
+      throw new HttpException(401, 'Incorrect username or password')
 
     const loginStatus = await bcrypt.compare(
       loginDto.password,
