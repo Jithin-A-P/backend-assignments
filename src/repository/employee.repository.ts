@@ -5,11 +5,7 @@ class EmployeeRepository {
   constructor(private employeeRepository: Repository<Employee>) {}
 
   public findAll = (): Promise<Employee[]> => {
-    return this.employeeRepository.find({
-      relations: {
-        address: true
-      },
-    })
+    return this.employeeRepository.find()
   }
 
   public findById = (id: number): Promise<Employee> => {

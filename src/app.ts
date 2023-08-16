@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: __dirname + '/.env' })
 
 import express from 'express'
+import cors from 'cors';
 import 'reflect-metadata'
 import loggerMiddleware from './middleware/logger.middleware'
 import dataSource from './db/postgres.db'
@@ -15,6 +16,7 @@ import logger from './utils/winston.logger'
 const server = express()
 const PORT = process.env.PORT
 
+server.use(cors())
 server.use(express.json())
 server.use(loggerMiddleware)
 server.use('/api/employees', employeeRoute)
