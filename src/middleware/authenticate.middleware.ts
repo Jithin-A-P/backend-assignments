@@ -21,7 +21,7 @@ const autheticate = async (
     next()
   } catch (error) {
     if(error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError')
-      next(new HttpException(403, 'You are not authorized to perform this action'))
+      next(new HttpException(401, 'You are not unauthorized to perform this action'))
     next(error)
   }
 }

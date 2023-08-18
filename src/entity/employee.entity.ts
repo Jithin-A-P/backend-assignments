@@ -5,7 +5,7 @@ import Role from '../utils/role.enum'
 import Department from './department.entity'
 import Status from '../utils/status.enum'
 
-@Entity('employee') // PARAM: name of the table
+@Entity('employee')
 class Employee extends AbstractEntity {
   @Column()
   name: string
@@ -22,7 +22,7 @@ class Employee extends AbstractEntity {
   @Column({ default: 0 })
   experience: number
 
-  @Column({ default: Role.DEVELOPER })
+  @Column({ default: Role.EMPLOYEE })
   role: Role
 
   @Column({ default: Status.ACTIVE })
@@ -33,7 +33,7 @@ class Employee extends AbstractEntity {
 
   @ManyToOne(() => Department, (department) => department.employees)
   @JoinColumn({ name: 'department_id' })
-  department: Department
+  department?: Department
 
   @OneToOne(() => Address, (address) => address.employee, { cascade: true })
   address: Address

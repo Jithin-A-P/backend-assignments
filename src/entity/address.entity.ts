@@ -7,7 +7,7 @@ class Address extends AbstractEntity {
   @Column()
   line1: string
 
-  @Column({ nullable: true })
+  @Column()
   line2: string
 
   @Column()

@@ -52,12 +52,15 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const employeeDto = plainToInstance(EmployeeDto, req.body)
       const errors = await validate(employeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
+
       const addedEmployee = await this.employeeService.addEmployee(
-        employeeDto as Employee
+        employeeDto
       )
+
       res.status(201)
       res.locals = {
         data: addedEmployee,
@@ -77,7 +80,9 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const employees = await this.employeeService.getAllEmployees()
+
       res.status(200)
       res.locals = {
         data: employees,
@@ -97,9 +102,11 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
+
       const employee = await this.employeeService.getEmployeeById(employeeId)
       res.status(200)
       res.locals = {
@@ -120,16 +127,20 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
+
       const editEmployeeDto = plainToInstance(EditEmployeeDto, req.body)
       const errors = await validate(editEmployeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
+
       const employee = await this.employeeService.editEmployee(
         employeeId,
         editEmployeeDto
       )
+
       res.status(200)
       res.locals = {
         data: employee,
@@ -149,16 +160,20 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
+
       const employeeDto = plainToInstance(EmployeeDto, req.body)
       const errors = await validate(employeeDto)
       if (errors.length > 0) throw new ValidationException(errors)
+
       const updatedEmployee = await this.employeeService.updateEmployee(
-        employeeDto as Employee,
-        employeeId
+        employeeId,
+        employeeDto
       )
+
       res.status(200)
       res.locals = {
         data: updatedEmployee,
@@ -177,10 +192,13 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
+      
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
+
       await this.employeeService.removeEmployeeById(employeeId)
+
       res.status(204)
       next()
     } catch (error) {
@@ -195,10 +213,13 @@ class EmployeeController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const credentialsDto = plainToInstance(LoginDto, req.body)
       const errors = await validate(credentialsDto)
       if (errors.length > 0) throw new ValidationException(errors)
+
       const token = await this.employeeService.loginEmployee(credentialsDto)
+
       res.status(200)
       res.locals = {
         data: token,

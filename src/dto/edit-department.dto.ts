@@ -1,8 +1,9 @@
-import { ValidateIf } from 'class-validator'
-import Department from '../entity/department.entity'
+import { IsNotEmpty, IsString, ValidateIf } from 'class-validator'
 
-class EditDepartmentDto extends Department {
+class EditDepartmentDto {
   @ValidateIf((obj) => obj.value !== undefined)
+  @IsNotEmpty()
+  @IsString()
   name: string
 }
 

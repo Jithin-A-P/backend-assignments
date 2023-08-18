@@ -22,11 +22,13 @@ const errorMiddleware = (
       res.status(error.status).send(error.errorPayload)
       return
     }
+
     if (error instanceof HttpException) {
       res.status(error.status)
       res.statusMessage = HttpStatusMessages[`CODE_${error.status}`]
       res.locals.errors = error.message
     }
+    
     res.send({ 
       data: null,
       error: res.locals.errors,

@@ -6,6 +6,7 @@ import EmployeeRepository from '../repository/employee.repository'
 import LoginDto from '../dto/login.dto'
 import NotFoundException from '../exception/not-found.exception'
 import EditEmployeeDto from '../dto/edit-employee.dto'
+import EmployeeDto from '../dto/employee.dto'
 
 class EmployeeService {
   constructor(private employeeRepository: EmployeeRepository) {}
@@ -26,13 +27,20 @@ class EmployeeService {
     editEmployeeDto: EditEmployeeDto
   ): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
+
     if (!employee)
       throw new NotFoundException(`Employee not found with id: ${id}`)
-    for (const k in editEmployeeDto)
-      if (!(k in employee)) throw new HttpException(400, 'Bad Request')
+
+    for (const key in editEmployeeDto)
+      if (!(key in employee)) throw new HttpException(400, 'Bad Request, received body contains invalid keys')
+    
     const editedEmployee = await this.employeeRepository.update({
       ...employee,
       ...editEmployeeDto,
+      address: {
+        ...employee.address,
+        ...editEmployeeDto?.address,
+      },
     })
     return editedEmployee
   }
@@ -42,7 +50,7 @@ class EmployeeService {
     return this.employeeRepository.remove(employee)
   }
 
-  public addEmployee = async (employeeDto: Employee): Promise<Employee> => {
+  public addEmployee = async (employeeDto: EmployeeDto): Promise<Employee> => {
     const newEmployee = {
       ...employeeDto,
       password: await hash(employeeDto.password, 10),
@@ -51,8 +59,8 @@ class EmployeeService {
   }
 
   public updateEmployee = async (
-    employeeDto: Employee,
-    id: number
+    id: number,
+    employeeDto: EmployeeDto
   ): Promise<Employee> => {
     const employee = await this.getEmployeeById(id)
     if (!employee)
