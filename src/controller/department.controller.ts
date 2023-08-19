@@ -3,11 +3,8 @@ import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import DepartmentService from '../service/department.service'
-import { plainToInstance } from 'class-transformer'
 import DepartmentDto from '../dto/department.dto'
-import { validate } from 'class-validator'
-import ValidationException from '../exception/validation.exception'
-import Department from '../entity/department.entity'
+import validator from '../middleware/validator.middleware'
 import EditDepartmentDto from '../dto/edit-department.dto'
 import HttpException from '../exception/http.exception'
 
@@ -20,6 +17,7 @@ class DepartmentController {
       '/',
       autheticate,
       authorize([Role.ADMIN, Role.HR]),
+      validator(DepartmentDto),
       this.addDepartment
     )
     this.router.get('/:id', autheticate, this.getDepartmentById)
@@ -27,12 +25,14 @@ class DepartmentController {
       '/:id',
       autheticate,
       authorize([Role.ADMIN, Role.HR]),
+      validator(DepartmentDto),
       this.updateDepartmentById
     )
     this.router.patch(
       '/:id',
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
+      validator(EditDepartmentDto),
       this.editDepartmentById
     )
     this.router.delete(
@@ -50,7 +50,9 @@ class DepartmentController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const departments = await this.departmentService.getAllDepartments()
+
       res.status(200)
       res.locals = {
         data: departments,
@@ -70,9 +72,11 @@ class DepartmentController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
+
       const department = await this.departmentService.getDepartmentById(
         departmentId
       )
@@ -95,15 +99,14 @@ class DepartmentController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
-      const editDepartmentDto = plainToInstance(EditDepartmentDto, req.body)
-      const errors = await validate(editDepartmentDto)
-      if (errors.length > 0) throw new ValidationException(errors)
+
       const department = await this.departmentService.editDepartment(
         departmentId,
-        editDepartmentDto
+        req.body
       )
       res.status(200)
       res.locals = {
@@ -124,12 +127,11 @@ class DepartmentController {
   ) => {
     try {
       const startTime = new Date().getTime()
-      const departmentDto = plainToInstance(DepartmentDto, req.body)
-      const errors = await validate(departmentDto)
-      if (errors.length > 0) throw new ValidationException(errors)
+
       const addedDepartment = await this.departmentService.addDepartment(
-        departmentDto as Department
+        req.body
       )
+
       res.status(201)
       res.locals = {
         data: addedDepartment,
@@ -149,16 +151,16 @@ class DepartmentController {
   ) => {
     try {
       const startTime = new Date().getTime()
+
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
-      const departmentDto = plainToInstance(DepartmentDto, req.body)
-      const errors = await validate(departmentDto)
-      if (errors.length > 0) throw new ValidationException(errors)
+
       const updatedDepartment = await this.departmentService.updateDepartment(
-        departmentDto as Department,
-        departmentId
+        departmentId,
+        req.body
       )
+
       res.status(200)
       res.locals = {
         data: updatedDepartment,
@@ -180,6 +182,7 @@ class DepartmentController {
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
+
       await this.departmentService.removeDepartmentById(departmentId)
       res.status(204)
       next()

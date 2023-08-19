@@ -32,8 +32,12 @@ class EmployeeService {
       throw new NotFoundException(`Employee not found with id: ${id}`)
 
     for (const key in editEmployeeDto)
-      if (!(key in employee)) throw new HttpException(400, 'Bad Request, received body contains invalid keys')
-    
+      if (!(key in employee))
+        throw new HttpException(
+          400,
+          'Bad Request, received body contains invalid keys'
+        )
+
     const editedEmployee = await this.employeeRepository.update({
       ...employee,
       ...editEmployeeDto,
