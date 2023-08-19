@@ -29,11 +29,9 @@ dataSource
   .initialize()
   .then(() => {
     server.listen(PORT, () => {
-      console.log(`Server started on port : ${PORT}`)
-      logger.log({level: 'error', message:`Server started on port : ${PORT}`})
+      logger.log({level: 'info', message:`Server started on port : ${PORT}`})
     })
   })
   .catch((error: Error) => {
-    console.log("Error, can't connect to db : ", error)
     logger.log({level: 'error', message:`Error, can't connect to db ${error}`})
   })

@@ -4,8 +4,11 @@ import Employee from '../entity/employee.entity'
 class EmployeeRepository {
   constructor(private employeeRepository: Repository<Employee>) {}
 
-  public findAll = (): Promise<Employee[]> => {
-    return this.employeeRepository.find()
+  public findAll = (skip: number, take: number): Promise<Employee[]> => {
+    return this.employeeRepository.find({
+      skip: skip,
+      take: take,
+    })
   }
 
   public findById = (id: number): Promise<Employee> => {

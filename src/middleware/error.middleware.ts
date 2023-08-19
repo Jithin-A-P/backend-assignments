@@ -28,11 +28,11 @@ const errorMiddleware = (
       res.statusMessage = HttpStatusMessages[`CODE_${error.status}`]
       res.locals.errors = error.message
     }
-    
+
     res.send({ 
       data: null,
-      error: res.locals.errors,
-      message: res.statusMessage,
+      error: res.statusMessage,
+      message: res.locals.errors,
       meta: {
         took: new Date().getTime() - res.locals.startTime
       }

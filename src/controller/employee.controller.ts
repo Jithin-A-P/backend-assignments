@@ -51,15 +51,12 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const addedEmployee = await this.employeeService.addEmployee(req.body)
 
       res.status(201)
       res.locals = {
         data: addedEmployee,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -73,15 +70,18 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
+      const rowsPerPage = Number(req.query.rowsPerPage)
+      const pageNumber = Number(req.query.pageNumber)
 
-      const employees = await this.employeeService.getAllEmployees()
+      const employees = await this.employeeService.getAllEmployees(
+        rowsPerPage,
+        pageNumber
+      )
 
       res.status(200)
       res.locals = {
         data: employees,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -95,8 +95,6 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
@@ -106,7 +104,6 @@ class EmployeeController {
       res.locals = {
         data: employee,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -120,8 +117,6 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
@@ -135,7 +130,6 @@ class EmployeeController {
       res.locals = {
         data: employee,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -149,8 +143,6 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const employeeId = Number(req.params.id)
       if (!Number.isInteger(employeeId))
         throw new HttpException(400, 'Bad Request, invalid employee URL')
@@ -164,7 +156,6 @@ class EmployeeController {
       res.locals = {
         data: updatedEmployee,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -197,15 +188,12 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const token = await this.employeeService.loginEmployee(req.body)
 
       res.status(200)
       res.locals = {
         data: token,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {

@@ -28,11 +28,6 @@ class EditEmployeeDto {
 
   @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
-  @IsString()
-  password: string
-
-  @ValidateIf((obj) => obj.value !== undefined)
-  @IsNotEmpty()
   @IsDateString()
   joiningDate: string
 

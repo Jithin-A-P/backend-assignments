@@ -4,6 +4,8 @@ import { randomUUID } from 'crypto'
 
 const loggerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   res.locals.traceId = randomUUID()
+  res.locals.startTime = new Date().getTime()
+
   logger.log({
     level: 'info',
     traceId: res.locals.traceId,

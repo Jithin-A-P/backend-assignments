@@ -49,15 +49,12 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const departments = await this.departmentService.getAllDepartments()
 
       res.status(200)
       res.locals = {
         data: departments,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -71,8 +68,6 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
@@ -84,7 +79,6 @@ class DepartmentController {
       res.locals = {
         data: department,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -98,8 +92,6 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
@@ -112,7 +104,6 @@ class DepartmentController {
       res.locals = {
         data: department,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -126,8 +117,6 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const addedDepartment = await this.departmentService.addDepartment(
         req.body
       )
@@ -136,7 +125,6 @@ class DepartmentController {
       res.locals = {
         data: addedDepartment,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
@@ -150,8 +138,6 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const startTime = new Date().getTime()
-
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
         throw new HttpException(400, 'Bad Request, invalid department URL')
@@ -165,7 +151,6 @@ class DepartmentController {
       res.locals = {
         data: updatedDepartment,
         errors: null,
-        startTime: startTime,
       }
       next()
     } catch (error) {
