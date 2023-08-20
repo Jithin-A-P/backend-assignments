@@ -1,9 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm'
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne } from 'typeorm'
 import Address from './address.entity'
 import AbstractEntity from './absract.entity'
 import Role from '../utils/role.enum'
 import Department from './department.entity'
 import Status from '../utils/status.enum'
+import Book from './book.entity'
 
 @Entity('employee')
 class Employee extends AbstractEntity {
@@ -37,6 +38,16 @@ class Employee extends AbstractEntity {
 
   @OneToOne(() => Address, (address) => address.employee, { cascade: true })
   address: Address
+
+  @ManyToMany(() => Book, (book) => book.borrowedByEmployees)
+  @JoinTable({
+    name: 'borrowed_book',
+    inverseJoinColumn: {
+      name: 'book_isbn',
+      referencedColumnName: 'isbn'
+    }
+  })
+  borrowedBooks?: Book[]
 }
 
 export default Employee

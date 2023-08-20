@@ -1,6 +1,7 @@
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Shelf from './shelf.entity'
+import Employee from './employee.entity'
 
 @Entity()
 class Book extends AbstractEntity {
@@ -29,7 +30,7 @@ class Book extends AbstractEntity {
   thumbnailUrl?: string
 
   @Column()
-  toatlCount: number
+  totalCount: number
 
   @Column()
   availableCount: number
@@ -46,7 +47,10 @@ class Book extends AbstractEntity {
       referencedColumnName: 'shelfCode'
     }
   })
-  shelves: Shelf[]
+  shelves?: Shelf[]
+
+  @ManyToMany(() => Employee, (employee) => employee.borrowedBooks)
+  borrowedByEmployees?: Employee[]
 }
 
 export default Book

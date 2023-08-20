@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: __dirname + '/.env' })
 
 import express from 'express'
-import cors from 'cors';
+import cors from 'cors'
 import 'reflect-metadata'
 import loggerMiddleware from './middleware/logger.middleware'
 import dataSource from './db/postgres.db'
@@ -12,6 +12,9 @@ import roleRoute from './routes/role.route'
 import departmentRoute from './routes/department.route'
 import jsonFormatter from './middleware/jsonformatter.middleware'
 import logger from './utils/winston.logger'
+import Book from './entity/book.entity'
+import Shelf from './entity/shelf.entity'
+import BookShelfJn from './entity/book-shelf-jn.entity'
 
 const server = express()
 const PORT = process.env.PORT
@@ -29,9 +32,12 @@ dataSource
   .initialize()
   .then(() => {
     server.listen(PORT, () => {
-      logger.log({level: 'info', message:`Server started on port : ${PORT}`})
+      logger.log({ level: 'info', message: `Server started on port : ${PORT}` })
     })
   })
   .catch((error: Error) => {
-    logger.log({level: 'error', message:`Error, can't connect to db ${error}`})
+    logger.log({
+      level: 'error',
+      message: `Error, can't connect to db ${error}`,
+    })
   })
