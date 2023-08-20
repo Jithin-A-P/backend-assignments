@@ -6,6 +6,9 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 import Employee from '../entity/employee.entity'
 import Address from '../entity/address.entity'
 import Department from '../entity/department.entity'
+import Book from '../entity/book.entity'
+import Shelf from '../entity/shelf.entity'
+import BookShelfJn from '../entity/book-shelf-jn.entity'
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -14,7 +17,7 @@ const dataSource = new DataSource({
   username: process.env.POSTGRES_USERNAME,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
-  entities: [Employee, Address, Department],
+  entities: [Employee, Address, Department, Book, Shelf, BookShelfJn],
   logging: false,
   namingStrategy: new SnakeNamingStrategy(),
   synchronize: false,
