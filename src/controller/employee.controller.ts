@@ -54,10 +54,7 @@ class EmployeeController {
       const addedEmployee = await this.employeeService.addEmployee(req.body)
 
       res.status(201)
-      res.locals = {
-        data: addedEmployee,
-        errors: null,
-      }
+      res.locals.data = addedEmployee
       next()
     } catch (error) {
       next(error)
@@ -79,10 +76,7 @@ class EmployeeController {
       )
 
       res.status(200)
-      res.locals = {
-        data: employees,
-        errors: null,
-      }
+      res.locals.data = employees
       next()
     } catch (error) {
       next(error)
@@ -101,10 +95,7 @@ class EmployeeController {
 
       const employee = await this.employeeService.getEmployeeById(employeeId)
       res.status(200)
-      res.locals = {
-        data: employee,
-        errors: null,
-      }
+      res.locals.data = employee
       next()
     } catch (error) {
       next(error)
@@ -127,10 +118,7 @@ class EmployeeController {
       )
 
       res.status(200)
-      res.locals = {
-        data: employee,
-        errors: null,
-      }
+      res.locals.data = employee
       next()
     } catch (error) {
       next(error)
@@ -153,10 +141,7 @@ class EmployeeController {
       )
 
       res.status(200)
-      res.locals = {
-        data: updatedEmployee,
-        errors: null,
-      }
+      res.locals.data = updatedEmployee
       next()
     } catch (error) {
       next(error)
@@ -191,10 +176,7 @@ class EmployeeController {
       const token = await this.employeeService.loginEmployee(req.body)
 
       res.status(200)
-      res.locals = {
-        data: token,
-        errors: null,
-      }
+      res.locals.data = token
       next()
     } catch (error) {
       next(error)

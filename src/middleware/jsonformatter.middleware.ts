@@ -12,16 +12,16 @@ const jsonFormatter = (req: Request, res: Response, next: NextFunction) => {
       message: res.statusMessage,
       errors: res.locals.errors,
       meta: {
-        length: isArray(data) ? data.length: 1,
+        length: isArray(data) ? data.length : 1,
         took: new Date().getTime() - res.locals.startTime,
-        total: isArray(data) ? data.length: 1,
+        total: isArray(data) ? data.length : 1,
       },
     }
     logger.log({
       level: 'info',
       timeStamp: new Date(),
       traceId: res.locals.traceId,
-      message: `${req.url} : ${req.method} :  ${res.statusCode}`,
+      message: `${res.locals.traceId} : ${req.url} : ${req.method} : ${res.statusCode}`,
     })
     res.send(responseBody)
   } catch (error) {

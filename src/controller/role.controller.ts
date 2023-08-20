@@ -12,10 +12,7 @@ class RoleController {
 
   private getRoles = (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.locals = {
-        data: Object.values(Role),
-        errors: null,
-      }
+      res.locals.data = Object.values(Role)
       res.status(200)
       next()
     } catch (error) {

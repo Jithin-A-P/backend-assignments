@@ -52,10 +52,7 @@ class DepartmentController {
       const departments = await this.departmentService.getAllDepartments()
 
       res.status(200)
-      res.locals = {
-        data: departments,
-        errors: null,
-      }
+      res.locals.data = departments
       next()
     } catch (error) {
       next(error)
@@ -76,10 +73,8 @@ class DepartmentController {
         departmentId
       )
       res.status(200)
-      res.locals = {
-        data: department,
-        errors: null,
-      }
+      res.locals.data = department
+
       next()
     } catch (error) {
       next(error)
@@ -101,10 +96,8 @@ class DepartmentController {
         req.body
       )
       res.status(200)
-      res.locals = {
-        data: department,
-        errors: null,
-      }
+      res.locals.data = department
+
       next()
     } catch (error) {
       next(error)
@@ -122,10 +115,8 @@ class DepartmentController {
       )
 
       res.status(201)
-      res.locals = {
-        data: addedDepartment,
-        errors: null,
-      }
+      res.locals.data = addedDepartment
+
       next()
     } catch (error) {
       next(error)
@@ -148,10 +139,8 @@ class DepartmentController {
       )
 
       res.status(200)
-      res.locals = {
-        data: updatedDepartment,
-        errors: null,
-      }
+      res.locals.data = updatedDepartment
+
       next()
     } catch (error) {
       next(error)
