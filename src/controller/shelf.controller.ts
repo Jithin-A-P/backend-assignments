@@ -45,6 +45,7 @@ class ShelfController {
             const shelf = await this.shelfService.getShelfById(shelfId);
             res.status(200);
             res.locals.data = shelf;
+            
             next();
         } catch (error) {
             next(error);
@@ -73,7 +74,6 @@ class ShelfController {
     ) => {
         try{
             const shelfId = Number(req.params.id);
-            console.log(shelfId);
             if (!Number.isInteger(shelfId))
                 throw new HttpException(400, 'Bad Request, invalid shelf URL')
             const editedShelf = await this.shelfService.editShelf(shelfId, req.body);
@@ -93,7 +93,6 @@ class ShelfController {
         try{
            
             const shelfId = Number(req.params.id);
-            console.log(shelfId);
             if (!Number.isInteger(shelfId))
                 throw new HttpException(400, 'Bad Request, invalid shelf URL')
             const updatedShelf = await this.shelfService.updateShelf(shelfId, req.body);

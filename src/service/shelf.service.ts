@@ -26,7 +26,7 @@ class ShelfService {
     }
 
     public getShelfById = async(id: number): Promise<Shelf> => {
-        const shelf = await this.getShelfById(id);
+        const shelf = await this.shelfRepository.findById(id);
         if (!shelf)
         throw new NotFoundException(`Shelf not found with id: ${id}`)
       return shelf
