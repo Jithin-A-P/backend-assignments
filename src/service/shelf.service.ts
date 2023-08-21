@@ -4,10 +4,10 @@ import Book from "../entity/book.entity";
 import Shelf from "../entity/shelf.entity";
 import HttpException from "../exception/http.exception";
 import NotFoundException from "../exception/not-found.exception";
-import ShlefRepository from "../repository/shelf.repository";
+import ShelfRepository from "../repository/shelf.repository";
 
 class ShelfService {
-    constructor(private shelfRepository: ShlefRepository) {}
+    constructor(private shelfRepository: ShelfRepository) {}
 
     // public getAllShelves = (
     //     rowsPerPage: number,

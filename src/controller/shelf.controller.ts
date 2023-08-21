@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import ShelfService from "../service/shlef.service";
+import ShelfService from "../service/shelf.service";
 import HttpException from "../exception/http.exception";
 import ShelfDto from "../dto/shelf.dto";
 import validator from '../middleware/validator.middleware'
@@ -41,6 +41,7 @@ class ShelfController {
             const shelfId = Number(req.params.id);
             if (!Number.isInteger(shelfId))
                 throw new HttpException(400, 'Bad Request, invalid shelf URL')
+            
             const shelf = await this.shelfService.getShelfById(shelfId);
             res.status(200);
             res.locals.data = shelf;
@@ -72,6 +73,7 @@ class ShelfController {
     ) => {
         try{
             const shelfId = Number(req.params.id);
+            console.log(shelfId);
             if (!Number.isInteger(shelfId))
                 throw new HttpException(400, 'Bad Request, invalid shelf URL')
             const editedShelf = await this.shelfService.editShelf(shelfId, req.body);
@@ -89,7 +91,9 @@ class ShelfController {
         next: NextFunction
     ) => {
         try{
+           
             const shelfId = Number(req.params.id);
+            console.log(shelfId);
             if (!Number.isInteger(shelfId))
                 throw new HttpException(400, 'Bad Request, invalid shelf URL')
             const updatedShelf = await this.shelfService.updateShelf(shelfId, req.body);

@@ -2,7 +2,7 @@ import ShelfController from "../controller/shelf.controller";
 import dataSource from "../db/postgres.db";
 import Shelf from "../entity/shelf.entity";
 import ShelfRepository from "../repository/shelf.repository";
-import ShelfService from "../service/shlef.service";
+import ShelfService from "../service/shelf.service";
 
 const shelfRepository = new ShelfRepository(
     dataSource.getRepository(Shelf)

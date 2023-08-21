@@ -97,7 +97,7 @@ describe('Employee Service Tests', () => {
       const mockFunction = jest.fn()
       mockFunction.mockResolvedValueOnce([{ id: 1, name: 'name' }])
       employeeRepository.findAll = mockFunction
-      const employee = await employeeService.getAllEmployees()
+      const employee = await employeeService.getAllEmployees(10,1)
       expect(employee).toStrictEqual([{ id: 1, name: 'name' }])
     })
 
@@ -105,7 +105,7 @@ describe('Employee Service Tests', () => {
       const mockFunction = jest.fn()
       mockFunction.mockResolvedValueOnce([])
       employeeRepository.findAll = mockFunction
-      const employees = await employeeService.getAllEmployees()
+      const employees = await employeeService.getAllEmployees(10,1)
       expect(employees).toStrictEqual([])
     })
   })
@@ -385,7 +385,7 @@ describe('Employee Service Tests', () => {
       const updateEmployeeDto = plainToInstance(EmployeeDto, mockEmployee)
       expect(
         async () =>
-          await employeeService.updateEmployee(updateEmployeeDto as Employee)
+          await employeeService.updateEmployee(1, updateEmployeeDto as Employee)
       ).not.toThrowError(HttpException)
     })
 
@@ -442,7 +442,7 @@ describe('Employee Service Tests', () => {
       const updateEmployeeDto = plainToInstance(EmployeeDto, mockEmployee)
       expect(
         async () =>
-          await employeeService.updateEmployee(updateEmployeeDto as Employee)
+          await employeeService.updateEmployee(1, updateEmployeeDto as Employee)
       ).rejects.toThrowError()
     })
   })
