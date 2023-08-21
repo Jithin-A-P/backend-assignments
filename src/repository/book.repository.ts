@@ -1,25 +1,21 @@
-import { Repository } from "typeorm";
-import Book from "../entity/book.entity";
+import { Repository } from 'typeorm'
+import Book from '../entity/book.entity'
 
 class BookRepository {
   constructor(private bookRepository: Repository<Book>) {}
 
   public findAll = (): Promise<Book[]> => {
-    return this.bookRepository.find({
-      relations: {
-        shelves: true,
-      },
-    });
-  };
+    return this.bookRepository.find()
+  }
 
-  public findById = (id: number): Promise<Book> => {
+  public findById = (id: number, getShlefDetails: boolean): Promise<Book> => {
     return this.bookRepository.findOne({
       where: { id: id },
       relations: {
-        shelves: true,
+        shelves: getShlefDetails,
       },
-    });
-  };
+    })
+  }
 
   public findByISBN = (isbn: string): Promise<Book> => {
     return this.bookRepository.findOne({
@@ -27,20 +23,20 @@ class BookRepository {
       relations: {
         shelves: true,
       },
-    });
-  };
+    })
+  }
 
   public addBook = (book: Book): Promise<Book> => {
-    return this.bookRepository.save(book);
-  };
+    return this.bookRepository.save(book)
+  }
 
   public updateBook = (book: Book): Promise<Book> => {
-    return this.bookRepository.save(book);
-  };
+    return this.bookRepository.save(book)
+  }
 
   public removeBook = (book: Book): Promise<Book> => {
-    return this.bookRepository.softRemove(book);
-  };
+    return this.bookRepository.softRemove(book)
+  }
 }
 
-export default BookRepository;
+export default BookRepository

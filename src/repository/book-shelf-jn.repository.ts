@@ -21,8 +21,8 @@ class BookShelfJnRepository {
     });
   };
 
-  public addEntry = (bookShelfJnEntry: BookShelfJn) => {
-    this.bookShelfRepository.save(bookShelfJnEntry);
+  public addEntries = (bookShelfJnEntries: BookShelfJn[]) => {
+    this.bookShelfRepository.save(bookShelfJnEntries);
   };
 
   public updateEntry = (bookShelfJnEntry: BookShelfJn) => {

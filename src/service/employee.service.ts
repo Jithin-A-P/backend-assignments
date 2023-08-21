@@ -109,6 +109,7 @@ class EmployeeService {
       throw new HttpException(401, 'Incorrect username or password')
 
     const payload = {
+      id: employee.id,
       name: employee.name,
       email: employee.email,
       role: employee.role,

@@ -1,10 +1,14 @@
+import { Type } from "class-transformer";
 import {
   IsNotEmpty,
   IsString,
   IsDateString,
   IsNumber,
   ValidateIf,
+  IsArray,
+  ValidateNested,
 } from "class-validator";
+import ShelfDetailsDto from "./shelf-details.dto";
 
 class BookDto {
   @IsNotEmpty()
@@ -24,36 +28,26 @@ class BookDto {
   category: string;
 
   @ValidateIf((obj) => obj.value !== undefined)
-  @IsNotEmpty()
   @IsString()
   description: string;
 
   @ValidateIf((obj) => obj.value !== undefined)
-  @IsNotEmpty()
   @IsString()
   publisher: string;
 
   @ValidateIf((obj) => obj.value !== undefined)
-  @IsNotEmpty()
   @IsDateString()
   releaseDate: string;
 
   @ValidateIf((obj) => obj.value !== undefined)
-  @IsNotEmpty()
   @IsString()
   thumbnailUrl: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  totalCount: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  availableCount: number;
-
-  @IsNotEmpty()
-  @IsString()
-  shelfCode: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ShelfDetailsDto)
+  shelves: ShelfDetailsDto[];
 }
 
 export default BookDto;

@@ -1,13 +1,13 @@
 import { IsNotEmpty, IsString } from 'class-validator'
 
-class ShelfDto {
+class LendBookDto {
+  @IsNotEmpty()
+  @IsString()
+  employeeId: number
+
   @IsNotEmpty()
   @IsString()
   shelfCode: string
-
-  @IsNotEmpty()
-  @IsString()
-  location: string
 }
 
-export default ShelfDto
+export default LendBookDto

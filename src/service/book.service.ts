@@ -1,135 +1,147 @@
-import HttpException from "../exception/http.exception";
-import NotFoundException from "../exception/not-found.exception";
-import BookDto from "../dto/book.dto";
-import EditBookDto from "../dto/edit-book.dto";
-import BookRepository from "../repository/book.repository";
-import BookShelfJnRepository from "../repository/book-shelf-jn.repository";
-import Book from "../entity/book.entity";
-import BookShelfJn from "../entity/book-shelf-jn.entity";
+import NotFoundException from '../exception/not-found.exception'
+import BookDto from '../dto/book.dto'
+import EditBookDto from '../dto/edit-book.dto'
+import BookRepository from '../repository/book.repository'
+import BookShelfJnRepository from '../repository/book-shelf-jn.repository'
+import Book from '../entity/book.entity'
+import BorrowedBookRepository from '../repository/borrowed-books.repository'
 
 class BookService {
   constructor(
     private bookRepository: BookRepository,
-    private bookShelfJnRepository: BookShelfJnRepository
+    private bookShelfJnRepository: BookShelfJnRepository,
+    private borrowedBookRepository: BorrowedBookRepository
   ) {}
 
   public getAllBooks = (): Promise<Book[]> => {
-    return this.bookRepository.findAll();
-  };
+    return this.bookRepository.findAll()
+  }
 
   public getBookById = async (id: number): Promise<Book> => {
-    const book = await this.bookRepository.findById(id);
-    if (!book) throw new NotFoundException(`Book not found with id: ${id}`);
-    return book;
-  };
+    const book = await this.bookRepository.findById(id, true)
+    if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
+    return book
+  }
 
   public getBookByISBN = async (isbn: string): Promise<Book> => {
-    const book = await this.bookRepository.findByISBN(isbn);
-    if (!book) throw new NotFoundException(`Book not found with isbn: ${isbn}`);
-    return book;
-  };
+    const book = await this.bookRepository.findByISBN(isbn)
+    if (!book) throw new NotFoundException(`Book not found with isbn: ${isbn}`)
+    return book
+  }
 
-  public addBook = async (
-    bookDto: BookDto
-  ): Promise<Book> => {
-    const newBook = this.bookRepository.addBook(bookDto);
-    const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-      bookDto.isbn,
-      bookDto.shelfCode
-    );
-    if (bookShelfJnEntry) {
-      bookShelfJnEntry.bookCount += bookDto.totalCount;
-      this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-    } else {
-      const newBookShelfJnEntry = new BookShelfJn();
-      newBookShelfJnEntry.bookIsbn = bookDto.isbn;
-      newBookShelfJnEntry.shelfCode = bookDto.shelfCode;
-      newBookShelfJnEntry.bookCount = bookDto.totalCount;
-      this.bookShelfJnRepository.addEntry(newBookShelfJnEntry);
-    }
-    return newBook;
-  };
+  public addBook = async (bookDto: BookDto): Promise<Book> => {
+    const { shelves } = bookDto
+    delete bookDto['shelves']
 
-  public updateBook = async (
-    id: number,
-    bookDto: BookDto
-  ): Promise<Book> => {
-    const book = await this.bookRepository.findById(id);
-    if (!book) throw new NotFoundException(`Book not found with id: ${id}`);
+    const totalCount = shelves.reduce((total, shelf) => total + shelf.bookCount, 0)
 
-    if (book.totalCount < bookDto.totalCount) {
-      bookDto.availableCount =
-        book.availableCount + (bookDto.totalCount - book.totalCount);
-      const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-        bookDto.isbn,
-        bookDto.shelfCode
-      );
-      bookShelfJnEntry.bookCount += bookDto.totalCount - book.totalCount;
-      this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-    } else if (book.totalCount > bookDto.totalCount) {
-      bookDto.availableCount =
-        book.availableCount - (book.totalCount - bookDto.totalCount);
-      const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-        bookDto.isbn,
-        bookDto.shelfCode
-      );
-      bookShelfJnEntry.bookCount -= book.totalCount - bookDto.totalCount;
-      this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-    }
+    const { id: addedBookId, isbn: addedBookIsbn } =
+      await this.bookRepository.addBook({
+        ...(bookDto as any),
+        totalCount: totalCount,
+        availableCount: totalCount,
+      })
 
-    return this.bookRepository.updateBook({
-      ...book,
-      ...bookDto,
-    });
-  };
+    this.bookShelfJnRepository.addEntries(
+      shelves.map((shelf) => ({
+        ...shelf,
+        bookIsbn: addedBookIsbn,
+      }))
+    )
+
+    return await this.bookRepository.findById(addedBookId, true)
+  }
+
+  public updateBook = async (id: number, bookDto: BookDto): Promise<Book> => {
+    const currentBook = await this.bookRepository.findById(id, false)
+    if (!currentBook)
+      throw new NotFoundException(`Book not found with id: ${id}`)
+
+    const { shelves } = bookDto
+    delete bookDto['shelves']
+
+    const totalCount = shelves.reduce((total, shelf) => total + shelf.bookCount, 0)
+
+    const { id: updatedBookId, isbn: updatedBookIsbn } =
+      await this.bookRepository.updateBook({
+        ...currentBook,
+        ...(bookDto as any),
+        totalCount: totalCount,
+        availableCount: totalCount,
+      })
+
+    const currentShelves = await this.bookShelfJnRepository.getAllEntries(
+      updatedBookIsbn
+    )
+
+    this.bookShelfJnRepository.addEntries(
+      shelves.map((shelf) => ({
+        ...currentShelves.filter(
+          (currentShelf) => currentShelf.shelfCode === shelf.shelfCode
+        )['0'],
+        ...shelf,
+      }))
+    )
+
+    return await this.bookRepository.findById(updatedBookId, true)
+  }
 
   public editBook = async (
     id: number,
-    editBookDto: EditBookDto,
+    editBookDto: EditBookDto
   ): Promise<Book> => {
-    const book = await this.bookRepository.findById(id);
-    if (!book) throw new NotFoundException(`Book not found with id: ${id}`);
+    const currentBook = await this.bookRepository.findById(id, false)
+    if (!currentBook)
+      throw new NotFoundException(`Book not found with id: ${id}`)
 
-    for (const key in editBookDto)
-      if (!(key in book)) throw new HttpException(400, `Bad Request`);
+    // if (editBookDto.shelfCode) {
+    //   if (book.totalCount < editBookDto.totalCount) {
+    //     editBookDto.availableCount =
+    //       book.availableCount + (editBookDto.totalCount - book.totalCount);
+    //     const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
+    //       editBookDto.isbn,
+    //       editBookDto.shelfCode
+    //     );
+    //     bookShelfJnEntry.bookCount += editBookDto.totalCount - book.totalCount;
+    //     this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
+    //   } else if (book.totalCount > editBookDto.totalCount) {
+    //     editBookDto.availableCount =
+    //       book.availableCount - (book.totalCount - editBookDto.totalCount);
+    //     const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
+    //       editBookDto.isbn,
+    //       editBookDto.shelfCode
+    //     );
+    //     bookShelfJnEntry.bookCount -= book.totalCount - editBookDto.totalCount;
+    //     this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
+    //   }
+    // }
 
-    if (editBookDto.shelfCode) {
-      if (book.totalCount < editBookDto.totalCount) {
-        editBookDto.availableCount =
-          book.availableCount + (editBookDto.totalCount - book.totalCount);
-        const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-          editBookDto.isbn,
-          editBookDto.shelfCode
-        );
-        bookShelfJnEntry.bookCount += editBookDto.totalCount - book.totalCount;
-        this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-      } else if (book.totalCount > editBookDto.totalCount) {
-        editBookDto.availableCount =
-          book.availableCount - (book.totalCount - editBookDto.totalCount);
-        const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-          editBookDto.isbn,
-          editBookDto.shelfCode
-        );
-        bookShelfJnEntry.bookCount -= book.totalCount - editBookDto.totalCount;
-        this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-      }
-    }
-
-    const editedBook = await this.bookRepository.updateBook({
-      ...book,
-      ...editBookDto,
-    });
-    return editedBook;
-  };
+    // const editedBook = await this.bookRepository.updateBook({
+    //   ...book,
+    //   ...editBookDto,
+    // });
+    return new Book()
+  }
 
   public removeBook = async (id: number): Promise<Book> => {
-    const book = await this.bookRepository.findById(id);
-    if (!book) throw new NotFoundException(`Book not found with id: ${id}`);
+    const book = await this.bookRepository.findById(id, false)
+    if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
 
-    const bookShelfJnEntries = await this.bookShelfJnRepository.getAllEntries(book.isbn);
-    this.bookShelfJnRepository.removeEntries(bookShelfJnEntries);
-    return this.bookRepository.removeBook(book);
-  };
+    const bookShelfJnEntries = await this.bookShelfJnRepository.getAllEntries(
+      book.isbn
+    )
+    this.bookShelfJnRepository.removeEntries(bookShelfJnEntries)
+
+    return this.bookRepository.removeBook(book)
+  }
+
+  // public lendBook = async (bookId: number): Promise<Book> => {
+  //   const lendedBook = await this.bookRepository.findById(bookId, true)
+
+  //   // await this.borrowed
+
+  //   return lendedBook
+  // }
 }
 
-export default BookService;
+export default BookService
