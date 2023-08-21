@@ -13,6 +13,7 @@ import departmentRoute from './routes/department.route'
 import jsonFormatter from './middleware/jsonformatter.middleware'
 import logger from './utils/winston.logger'
 import shelfRoute from './routes/shelf.route'
+import bookRoute from './routes/book.route'
 
 const server = express()
 const PORT = process.env.PORT
@@ -24,6 +25,7 @@ server.use('/api/employees', employeeRoute)
 server.use('/api/departments', departmentRoute)
 server.use('/api/roles', roleRoute)
 server.use('/api/shelfs', shelfRoute)
+server.use('/api/books', bookRoute)
 server.use(jsonFormatter)
 server.use(errorMiddleware)
 

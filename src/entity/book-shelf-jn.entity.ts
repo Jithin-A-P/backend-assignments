@@ -6,11 +6,11 @@ class BookShelfJn extends AbstractEntity {
   @Column()
   bookCount: number
 
-  // @Column()
-  // shelfCode: string
+  @Column()
+  shelfCode: string
 
-  // @Column()
-  // bookIsbn: string
+  @Column()
+  bookIsbn: string
 }
 
 export default BookShelfJn

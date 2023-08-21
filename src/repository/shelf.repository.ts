@@ -24,6 +24,15 @@ class ShelfRepository {
         })
     }
 
+    public findByShelfCode = (shelfCode: string): Promise<Shelf> => {
+        return this.shelfRepository.findOne({
+            where: {shelfCode: shelfCode},
+            relations: {
+                books: true,
+            }
+        })
+    }
+
     public add = (shelf: Shelf): Promise<Shelf> => {
         return this.shelfRepository.save(shelf);
     }
