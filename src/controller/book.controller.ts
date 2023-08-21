@@ -4,18 +4,48 @@ import HttpException from '../exception/http.exception'
 import BookDto from '../dto/book.dto'
 import validator from '../middleware/validator.middleware'
 import BorrowBookDto from '../dto/borrow-book.dto'
+import autheticate from '../middleware/authenticate.middleware'
+import authorize from '../middleware/authorize.middleware'
+import Role from '../utils/role.enum'
 
 class BookController {
   public router: Router
   constructor(private bookService: BookService) {
     this.router = Router()
-    this.router.get('/', this.getAllBooks)
-    this.router.get('/:id', this.getBookById)
-    this.router.post('/', validator(BookDto), this.addBook)
-    this.router.post('/:isbn/lend', validator(BorrowBookDto), this.borrowBook)
-    this.router.post('/:isbn/return', validator(BorrowBookDto), this.returnBook)
-    this.router.put('/:id', validator(BookDto), this.updateBook)
-    this.router.delete('/:id', this.removeBook)
+    this.router.get('/', autheticate, this.getAllBooks)
+    this.router.get('/:id', autheticate, this.getBookById)
+    this.router.post(
+      '/',
+      autheticate,
+      authorize([Role.ADMIN]),
+      validator(BookDto),
+      this.addBook
+    )
+    this.router.post(
+      '/:isbn/lend',
+      autheticate,
+      validator(BorrowBookDto),
+      this.borrowBook
+    )
+    this.router.post(
+      '/:isbn/return',
+      autheticate,
+      validator(BorrowBookDto),
+      this.returnBook
+    )
+    this.router.put(
+      '/:id',
+      autheticate,
+      authorize([Role.ADMIN]),
+      validator(BookDto),
+      this.updateBook
+    )
+    this.router.delete(
+      '/:id',
+      autheticate,
+      authorize([Role.ADMIN]),
+      this.removeBook
+    )
   }
 
   private getAllBooks = async (
