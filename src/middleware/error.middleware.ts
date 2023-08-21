@@ -3,6 +3,7 @@ import HttpException from '../exception/http.exception'
 import ValidationException from '../exception/validation.exception'
 import logger from '../utils/winston.logger'
 import HttpStatusMessages from '../utils/http-status-messages'
+import { QueryFailedError } from 'typeorm'
 
 const errorMiddleware = (
   error: Error,
@@ -15,8 +16,10 @@ const errorMiddleware = (
       level: 'error',
       message: `${res.locals.traceId} : ${error.message}`,
     })
+
     res.status(500)
     res.statusMessage = HttpStatusMessages['CODE_500']
+
     if (error instanceof ValidationException) {
       res.statusMessage = HttpStatusMessages[`CODE_${error.status}`]
       res.status(error.status).send(error.errorPayload)
@@ -29,10 +32,31 @@ const errorMiddleware = (
       res.locals.errors = error.message
     }
 
+    if (error instanceof QueryFailedError) {
+      const emailAlreadyExists = /(email)[\s\S]+(already exists)/.test(
+        (error as any).detail
+      )
+      const shelfCodeAlreadyExists = /(shelf_code)[\s\S]+(already exists)/.test(
+        (error as any).detail
+      )
+
+      if (emailAlreadyExists) {
+        res.status(400)
+        res.statusMessage = HttpStatusMessages[`CODE_400`]
+        res.locals.errors = 'Account with this email already exists'
+      }
+
+      if(shelfCodeAlreadyExists) {
+        res.status(400)
+        res.statusMessage = HttpStatusMessages[`CODE_400`]
+        res.locals.errors = 'Shelf with this shelf code already exists'
+      }
+    }
+
     res.send({ 
       data: null,
       error: res.statusMessage,
-      message: res.locals.errors,
+      message: res.locals.errors || error.message,
       meta: {
         took: new Date().getTime() - res.locals.startTime
       }

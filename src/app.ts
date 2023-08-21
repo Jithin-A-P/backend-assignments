@@ -12,9 +12,6 @@ import roleRoute from './routes/role.route'
 import departmentRoute from './routes/department.route'
 import jsonFormatter from './middleware/jsonformatter.middleware'
 import logger from './utils/winston.logger'
-import Book from './entity/book.entity'
-import Shelf from './entity/shelf.entity'
-import BookShelfJn from './entity/book-shelf-jn.entity'
 import shelfRoute from './routes/shelf.route'
 
 const server = express()

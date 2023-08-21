@@ -43,23 +43,14 @@ class EmployeeService {
       if (!(key in employee))
         throw new HttpException(400, `Bad Request, ${key} is not expeted`)
 
-    const editedEmployee = await this.employeeRepository
-      .update({
-        ...employee,
-        ...editEmployeeDto,
-        address: {
-          ...employee.address,
-          ...editEmployeeDto?.address,
-        },
-      })
-      .catch((error) => {
-        const emailAlreadyExists = /(email)[\s\S]+(already exists)/.test(
-          error.detail
-        )
-        if (emailAlreadyExists)
-          throw new HttpException(400, 'Account with this email already exists')
-        throw error
-      })
+    const editedEmployee = await this.employeeRepository.update({
+      ...employee,
+      ...editEmployeeDto,
+      address: {
+        ...employee.address,
+        ...editEmployeeDto?.address,
+      },
+    })
 
     return editedEmployee
   }
@@ -75,14 +66,7 @@ class EmployeeService {
       password: await hash(employeeDto.password, 10),
     }
 
-    const newEmployee = this.employeeRepository.add(employee).catch((error) => {
-      const emailAlreadyExists = /(email)[\s\S]+(already exists)/.test(
-        error.detail
-      )
-      if (emailAlreadyExists)
-        throw new HttpException(400, 'Account with this email already exists.')
-      throw error
-    })
+    const newEmployee = this.employeeRepository.add(employee)
 
     return newEmployee
   }
@@ -98,27 +82,15 @@ class EmployeeService {
 
     const updatedAddress = employeeDto.address
 
-    const updatedEmployee = this.employeeRepository
-      .update({
-        ...employee,
-        ...employeeDto,
-        password: await hash(employeeDto.password, 10),
-        address: {
-          ...employee.address,
-          ...updatedAddress,
-        },
-      })
-      .catch((error) => {
-        const emailAlreadyExists = /(email)[\s\S]+(already exists)/.test(
-          error.detail
-        )
-        if (emailAlreadyExists)
-          throw new HttpException(
-            400,
-            'This email is already being used by someone else.'
-          )
-        throw error
-      })
+    const updatedEmployee = this.employeeRepository.update({
+      ...employee,
+      ...employeeDto,
+      password: await hash(employeeDto.password, 10),
+      address: {
+        ...employee.address,
+        ...updatedAddress,
+      },
+    })
 
     return updatedEmployee
   }
