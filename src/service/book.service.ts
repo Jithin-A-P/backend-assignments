@@ -4,7 +4,10 @@ import EditBookDto from '../dto/edit-book.dto'
 import BookRepository from '../repository/book.repository'
 import BookShelfJnRepository from '../repository/book-shelf-jn.repository'
 import Book from '../entity/book.entity'
-import BorrowedBookRepository from '../repository/borrowed-books.repository'
+import BorrowedBookRepository from '../repository/borrowed-book.repository'
+import BorrowBookDto from '../dto/borrow-book.dto'
+import BorrowedBook from '../entity/borrowed-book.entity'
+import HttpException from '../exception/http.exception'
 
 class BookService {
   constructor(
@@ -23,17 +26,14 @@ class BookService {
     return book
   }
 
-  public getBookByISBN = async (isbn: string): Promise<Book> => {
-    const book = await this.bookRepository.findByISBN(isbn)
-    if (!book) throw new NotFoundException(`Book not found with isbn: ${isbn}`)
-    return book
-  }
-
   public addBook = async (bookDto: BookDto): Promise<Book> => {
     const { shelves } = bookDto
     delete bookDto['shelves']
 
-    const totalCount = shelves.reduce((total, shelf) => total + shelf.bookCount, 0)
+    const totalCount = shelves.reduce(
+      (total, shelf) => total + shelf.bookCount,
+      0
+    )
 
     const { id: addedBookId, isbn: addedBookIsbn } =
       await this.bookRepository.addBook({
@@ -60,7 +60,10 @@ class BookService {
     const { shelves } = bookDto
     delete bookDto['shelves']
 
-    const totalCount = shelves.reduce((total, shelf) => total + shelf.bookCount, 0)
+    const totalCount = shelves.reduce(
+      (total, shelf) => total + shelf.bookCount,
+      0
+    )
 
     const { id: updatedBookId, isbn: updatedBookIsbn } =
       await this.bookRepository.updateBook({
@@ -86,43 +89,6 @@ class BookService {
     return await this.bookRepository.findById(updatedBookId, true)
   }
 
-  public editBook = async (
-    id: number,
-    editBookDto: EditBookDto
-  ): Promise<Book> => {
-    const currentBook = await this.bookRepository.findById(id, false)
-    if (!currentBook)
-      throw new NotFoundException(`Book not found with id: ${id}`)
-
-    // if (editBookDto.shelfCode) {
-    //   if (book.totalCount < editBookDto.totalCount) {
-    //     editBookDto.availableCount =
-    //       book.availableCount + (editBookDto.totalCount - book.totalCount);
-    //     const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-    //       editBookDto.isbn,
-    //       editBookDto.shelfCode
-    //     );
-    //     bookShelfJnEntry.bookCount += editBookDto.totalCount - book.totalCount;
-    //     this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-    //   } else if (book.totalCount > editBookDto.totalCount) {
-    //     editBookDto.availableCount =
-    //       book.availableCount - (book.totalCount - editBookDto.totalCount);
-    //     const bookShelfJnEntry = await this.bookShelfJnRepository.getEntry(
-    //       editBookDto.isbn,
-    //       editBookDto.shelfCode
-    //     );
-    //     bookShelfJnEntry.bookCount -= book.totalCount - editBookDto.totalCount;
-    //     this.bookShelfJnRepository.updateEntry(bookShelfJnEntry);
-    //   }
-    // }
-
-    // const editedBook = await this.bookRepository.updateBook({
-    //   ...book,
-    //   ...editBookDto,
-    // });
-    return new Book()
-  }
-
   public removeBook = async (id: number): Promise<Book> => {
     const book = await this.bookRepository.findById(id, false)
     if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
@@ -135,13 +101,95 @@ class BookService {
     return this.bookRepository.removeBook(book)
   }
 
-  // public lendBook = async (bookId: number): Promise<Book> => {
-  //   const lendedBook = await this.bookRepository.findById(bookId, true)
+  public borrowBook = async (
+    bookIsbn: string,
+    borrowBookDto: BorrowBookDto
+  ): Promise<BorrowedBook> => {
+    const book = await this.bookRepository.findByISBN(bookIsbn, false)
 
-  //   // await this.borrowed
+    if (!book)
+      throw new NotFoundException(
+        `No books are available with isbn ${bookIsbn}`
+      )
 
-  //   return lendedBook
-  // }
+    if (book.availableCount === 0)
+      throw new HttpException(400, 'Requested book not available')
+
+    const { shelfCode, employeeId } = borrowBookDto
+
+    const bookShelfEntry = await this.bookShelfJnRepository.getEntry(
+      bookIsbn,
+      shelfCode
+    )
+
+    if (bookShelfEntry.bookCount === 0)
+      throw new HttpException(400, 'Requested book not available on the shelf')
+
+    const borrowedBook = await this.borrowedBookRepository.addBorrowedBook({
+      bookIsbn: bookIsbn,
+      employeeId: employeeId,
+      shelfBorrowedFrom: shelfCode,
+      borrowedAt: new Date().toISOString(),
+    })
+
+    await this.bookShelfJnRepository.updateEntry({
+      ...bookShelfEntry,
+      bookCount: bookShelfEntry.bookCount - 1,
+    })
+
+    await this.bookRepository.updateBook({
+      ...book,
+      availableCount: book.availableCount - 1,
+    })
+
+    return borrowedBook
+  }
+
+  public returnBook = async (
+    bookIsbn: string,
+    borrowBookDto: BorrowBookDto
+  ): Promise<BorrowedBook> => {
+    const book = await this.bookRepository.findByISBN(bookIsbn, false)
+
+    if (!book)
+      throw new NotFoundException(`No books are found with isbn ${bookIsbn}`)
+
+    const { shelfCode, employeeId } = borrowBookDto
+
+    const bookShelfEntry = await this.bookShelfJnRepository.getEntry(
+      bookIsbn,
+      shelfCode
+    )
+
+    const borrowedBook = await this.borrowedBookRepository.findBy({
+      employeeId: employeeId,
+      bookIsbn: bookIsbn,
+    })
+
+    if (!borrowedBook)
+      throw new HttpException(400, "Employee hasn't borrowed this book")
+
+    console.log({
+      ...borrowedBook,
+      returnedAt: new Date().toISOString(),
+      shelfReturnedTo: shelfCode,
+    })
+
+    // const updatedBorrowedBook =
+    await this.borrowedBookRepository.updateBorrowedBook(borrowedBook)
+
+    await this.bookShelfJnRepository.updateEntry({
+      ...bookShelfEntry,
+      bookCount: bookShelfEntry.bookCount + 1,
+    })
+
+    await this.bookRepository.updateBook({
+      ...book,
+      availableCount: book.availableCount + 1,
+    })
+
+    return null
+  }
 }
 
 export default BookService

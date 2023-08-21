@@ -1,22 +1,21 @@
-import { NextFunction, Request, Response, Router } from "express";
-import BookService from "../service/book.service";
-import HttpException from "../exception/http.exception";
-import BookDto from "../dto/book.dto";
-import EditBookDto from "../dto/edit-book.dto";
-import validator from "../middleware/validator.middleware";
-import LendBookDto from "../dto/lend-book.dto";
+import { NextFunction, Request, Response, Router } from 'express'
+import BookService from '../service/book.service'
+import HttpException from '../exception/http.exception'
+import BookDto from '../dto/book.dto'
+import validator from '../middleware/validator.middleware'
+import BorrowBookDto from '../dto/borrow-book.dto'
 
 class BookController {
-  public router: Router;
+  public router: Router
   constructor(private bookService: BookService) {
-    this.router = Router();
-    this.router.get("/", this.getAllBooks);
-    this.router.get("/:id", this.getBookById);
-    this.router.post("/", validator(BookDto), this.addBook);
-    // this.router.post("/:bookId/lend", validator(LendBookDto), this.lendBook);
-    this.router.put("/:id", validator(BookDto), this.updateBook);
-    this.router.patch("/:id", validator(EditBookDto), this.editBook);
-    this.router.delete("/:id", this.removeBook);
+    this.router = Router()
+    this.router.get('/', this.getAllBooks)
+    this.router.get('/:id', this.getBookById)
+    this.router.post('/', validator(BookDto), this.addBook)
+    this.router.post('/:isbn/lend', validator(BorrowBookDto), this.borrowBook)
+    this.router.post('/:isbn/return', validator(BorrowBookDto), this.returnBook)
+    this.router.put('/:id', validator(BookDto), this.updateBook)
+    this.router.delete('/:id', this.removeBook)
   }
 
   private getAllBooks = async (
@@ -25,14 +24,14 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const books = await this.bookService.getAllBooks();
-      res.status(200);
-      res.locals.data = books;
-      next();
+      const books = await this.bookService.getAllBooks()
+      res.status(200)
+      res.locals.data = books
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 
   private getBookById = async (
     req: Request,
@@ -40,63 +39,66 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id);
+      const bookId = Number(req.params.id)
       if (!Number.isInteger(bookId))
-        throw new HttpException(400, "Bad Request, invalid book URL");
+        throw new HttpException(400, 'Bad Request, invalid book URL')
 
-      const book = await this.bookService.getBookById(bookId);
-      res.status(200);
-      res.locals.data = book;
+      const book = await this.bookService.getBookById(bookId)
+      res.status(200)
+      res.locals.data = book
 
-      next();
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 
   private addBook = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const addedBook = await this.bookService.addBook(req.body);
-      res.status(201);
-      res.locals.data = addedBook;
-      next();
+      const addedBook = await this.bookService.addBook(req.body)
+      res.status(201)
+      res.locals.data = addedBook
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 
-  // private lendBook = async (req: Request, res: Response, next: NextFunction) => {
-  //   try {
-  //     const bookId = Number(req.params.bookId);
-
-  //     if (!Number.isInteger(bookId))
-  //       throw new HttpException(400, "Bad Request, invalid lend book URL");
-
-  //     res.status(200);
-  //     res.locals.data = 'ok'
-  //     next();
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
-
-  private editBook = async (
+  private borrowBook = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id);
-      if (!Number.isInteger(bookId))
-        throw new HttpException(400, "Bad Request, invalid book URL");
-      const editedBook = await this.bookService.editBook(bookId, req.body);
-      res.status(200);
-      res.locals.data = editedBook;
-      next();
+      const bookIsbn = req.params.isbn
+
+      const borrowedBook = await this.bookService.borrowBook(bookIsbn, req.body)
+
+      res.status(200)
+      res.locals.data = borrowedBook
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
+
+  private returnBook = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const bookIsbn = req.params.isbn
+
+      const returnedBook = await this.bookService.returnBook(bookIsbn, req.body)
+
+      res.status(200)
+      res.locals.data = returnedBook
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
 
   private updateBook = async (
     req: Request,
@@ -104,18 +106,18 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id);
+      const bookId = Number(req.params.id)
       if (!Number.isInteger(bookId))
-        throw new HttpException(400, "Bad Request, invalid book URL");
+        throw new HttpException(400, 'Bad Request, invalid book URL')
 
-      const updatedBook = await this.bookService.updateBook(bookId, req.body);
-      res.status(200);
-      res.locals.data = updatedBook;
-      next();
+      const updatedBook = await this.bookService.updateBook(bookId, req.body)
+      res.status(200)
+      res.locals.data = updatedBook
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 
   private removeBook = async (
     req: Request,
@@ -123,18 +125,18 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id);
+      const bookId = Number(req.params.id)
       if (!Number.isInteger(bookId))
-        throw new HttpException(400, "Bad Request, invalid book URL");
+        throw new HttpException(400, 'Bad Request, invalid book URL')
 
-      const editedBook = await this.bookService.removeBook(bookId);
-      res.status(204);
-      res.locals.data = editedBook;
-      next();
+      const editedBook = await this.bookService.removeBook(bookId)
+      res.status(204)
+      res.locals.data = editedBook
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 }
 
-export default BookController;
+export default BookController

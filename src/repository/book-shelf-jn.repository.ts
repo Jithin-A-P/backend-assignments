@@ -21,16 +21,16 @@ class BookShelfJnRepository {
     });
   };
 
-  public addEntries = (bookShelfJnEntries: BookShelfJn[]) => {
-    this.bookShelfRepository.save(bookShelfJnEntries);
+  public addEntries = (bookShelfJnEntries: BookShelfJn[]): Promise<BookShelfJn[]> => {
+    return this.bookShelfRepository.save(bookShelfJnEntries);
   };
 
-  public updateEntry = (bookShelfJnEntry: BookShelfJn) => {
-    this.bookShelfRepository.save(bookShelfJnEntry);
+  public updateEntry = async (bookShelfJnEntry: BookShelfJn): Promise<BookShelfJn> => {
+    return this.bookShelfRepository.save(bookShelfJnEntry);
   };
 
-  public removeEntries = (bookShelfJnEntries: BookShelfJn[]) => {
-    this.bookShelfRepository.softRemove(bookShelfJnEntries);
+  public removeEntries = async (bookShelfJnEntries: BookShelfJn[]): Promise<BookShelfJn[]> => {
+    return this.bookShelfRepository.softRemove(bookShelfJnEntries);
   };
 }
 

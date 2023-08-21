@@ -17,11 +17,11 @@ class BookRepository {
     })
   }
 
-  public findByISBN = (isbn: string): Promise<Book> => {
+  public findByISBN = (isbn: string, getShlefDetails: boolean): Promise<Book> => {
     return this.bookRepository.findOne({
       where: { isbn: isbn },
       relations: {
-        shelves: true,
+        shelves: getShlefDetails,
       },
     })
   }

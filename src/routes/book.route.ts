@@ -5,7 +5,7 @@ import BookRepository from '../repository/book.repository'
 import BookService from '../service/book.service'
 import BookShelfJnRepository from '../repository/book-shelf-jn.repository'
 import BookShelfJn from '../entity/book-shelf-jn.entity'
-import BorrowedBookRepository from '../repository/borrowed-books.repository'
+import BorrowedBookRepository from '../repository/borrowed-book.repository'
 import BorrowedBook from '../entity/borrowed-book.entity'
 
 const bookRepository = new BookRepository(dataSource.getRepository(Book))
