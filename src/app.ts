@@ -16,6 +16,7 @@ import Book from './entity/book.entity'
 import Shelf from './entity/shelf.entity'
 import BookShelfJn from './entity/book-shelf-jn.entity'
 import shelfRoute from './routes/shelf.route'
+import bookRoute from './routes/book.route'
 
 const server = express()
 const PORT = process.env.PORT
@@ -27,6 +28,7 @@ server.use('/api/employees', employeeRoute)
 server.use('/api/departments', departmentRoute)
 server.use('/api/roles', roleRoute)
 server.use('/api/shelfs', shelfRoute)
+server.use('/api/books', bookRoute)
 server.use(jsonFormatter)
 server.use(errorMiddleware)
 

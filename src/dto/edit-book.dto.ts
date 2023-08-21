@@ -6,19 +6,22 @@ import {
   ValidateIf,
 } from "class-validator";
 
-class BookDto {
+class EditBookDto {
   @IsNotEmpty()
   @IsString()
   isbn: string;
 
+  @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
   @IsString()
   title: string;
 
+  @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
   @IsString()
   author: string;
 
+  @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
   @IsString()
   category: string;
@@ -43,17 +46,20 @@ class BookDto {
   @IsString()
   thumbnailUrl: string;
 
+  @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
   @IsNumber()
   totalCount: number;
 
+  @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
   @IsNumber()
   availableCount: number;
 
+  @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
   @IsString()
   shelfCode: string;
 }
 
-export default BookDto;
+export default EditBookDto;
