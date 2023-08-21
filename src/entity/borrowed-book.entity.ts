@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Shelf from './shelf.entity'
 
@@ -11,12 +11,24 @@ class BorrowedBook extends AbstractEntity {
   bookIsbn: string
 
   @Column()
-  @OneToOne(() => Shelf)
   shelfBorrowedFrom: string
 
   @Column({ nullable: true })
-  @OneToOne(() => Shelf)
   shelfReturnedTo?: string
+
+  @ManyToOne(() => Shelf, (shelf) => shelf.borrowedBooks)
+  @JoinColumn({
+    name: 'shelf_borrowed_from',
+    referencedColumnName: 'shelfCode',
+  })
+  borrowedFrom?: Shelf
+
+  @ManyToOne(() => Shelf, (shelf) => shelf.returnedBooks)
+  @JoinColumn({
+    name: 'shelf_returned_to',
+    referencedColumnName: 'shelfCode',
+  })
+  returnedTo?: Shelf
 
   @Column()
   borrowedAt: string

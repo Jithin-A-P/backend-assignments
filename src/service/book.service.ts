@@ -1,6 +1,5 @@
 import NotFoundException from '../exception/not-found.exception'
 import BookDto from '../dto/book.dto'
-import EditBookDto from '../dto/edit-book.dto'
 import BookRepository from '../repository/book.repository'
 import BookShelfJnRepository from '../repository/book-shelf-jn.repository'
 import Book from '../entity/book.entity'
@@ -169,14 +168,15 @@ class BookService {
     if (!borrowedBook)
       throw new HttpException(400, "Employee hasn't borrowed this book")
 
-    console.log({
-      ...borrowedBook,
-      returnedAt: new Date().toISOString(),
-      shelfReturnedTo: shelfCode,
-    })
+    if (borrowedBook.returnedAt)
+      throw new HttpException(400, 'Book was already returned')
 
-    // const updatedBorrowedBook =
-    await this.borrowedBookRepository.updateBorrowedBook(borrowedBook)
+    const updatedBorrowedBook =
+      await this.borrowedBookRepository.updateBorrowedBook({
+        ...borrowedBook,
+        returnedAt: new Date().toISOString(),
+        shelfReturnedTo: shelfCode,
+      })
 
     await this.bookShelfJnRepository.updateEntry({
       ...bookShelfEntry,
@@ -188,7 +188,7 @@ class BookService {
       availableCount: book.availableCount + 1,
     })
 
-    return null
+    return updatedBorrowedBook
   }
 }
 
