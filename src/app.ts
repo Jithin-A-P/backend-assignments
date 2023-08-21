@@ -15,6 +15,7 @@ import logger from './utils/winston.logger'
 import Book from './entity/book.entity'
 import Shelf from './entity/shelf.entity'
 import BookShelfJn from './entity/book-shelf-jn.entity'
+import shelfRoute from './routes/shelf.route'
 
 const server = express()
 const PORT = process.env.PORT
@@ -25,6 +26,7 @@ server.use(loggerMiddleware)
 server.use('/api/employees', employeeRoute)
 server.use('/api/departments', departmentRoute)
 server.use('/api/roles', roleRoute)
+server.use('/api/shelfs', shelfRoute)
 server.use(jsonFormatter)
 server.use(errorMiddleware)
 
