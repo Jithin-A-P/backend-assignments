@@ -8,6 +8,7 @@ class ShelfDto {
     @IsNotEmpty()
     @IsString()
     location: string
+    
 
 }
 

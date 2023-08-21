@@ -77,7 +77,7 @@ class ShelfService {
         
         return this.shelfRepository.update({
             ...shelf,
-            ...ShelfDto
+            ...shelfDto
         })
     }
 }
