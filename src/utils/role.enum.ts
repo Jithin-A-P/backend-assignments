@@ -1,7 +1,8 @@
 enum Role {
   ADMIN = 'admin',
   HR = 'hr',
-  EMPLOYEE = 'employee'
+  EMPLOYEE = 'employee',
+  UI = 'ui'
 }
 
 export default Role
