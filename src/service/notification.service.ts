@@ -6,8 +6,8 @@ import NotificationRepository from "../repository/notification.repository";
 class NotificationService {
     constructor(private notificationRepository: NotificationRepository) {}
 
-    public getNotification = (): Promise<Notification[]> => {
-        return this.notificationRepository.findUnread();
+    public getNotification = (id: number): Promise<Notification[]> => {
+        return this.notificationRepository.findUnread(id);
     }
 
     public addNotification = (notification: NotificationDto):Promise<Notification> => {

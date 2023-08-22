@@ -14,9 +14,10 @@ class NotificationRepository {
         })
     }
 
-    public findUnread = (): Promise<Notification[]> => {
+    public findUnread = (id): Promise<Notification[]> => {
         return this.notificationRepository.find({
             where: {
+              employeeId: id,
                 status: 'unread'
             }
           })

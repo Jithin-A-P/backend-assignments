@@ -8,9 +8,8 @@ class NotificationController {
     public router: Router;
     constructor(private notificationService: NotificationService) {
         this.router = Router()
-        this.router.get('/', this.getNotifications)
-        this.router.post('/', validator(NotificationDto),this.addNotifications)
-        this.router.patch('/:id', this.editNotifications)
+        this.router.get('/:employeeId', this.getNotifications)
+        this.router.patch('/:notificationId',validator(NotificationDto), this.editNotifications)
     }
 
     private getNotifications = async(
@@ -19,28 +18,11 @@ class NotificationController {
         next: NextFunction
     ) => {
         try{
-            const notifications = await this.notificationService.getNotification();
+            const employeeId = Number(req.params.employeeId);
+            const notifications = await this.notificationService.getNotification(employeeId);
             
             res.status(200);
             res.locals.data = notifications;
-            next();
-        }catch (error) {
-            next(error)
-        }
-    }
-
-    private addNotifications = async(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ) => {
-        try{
-            const addedNotifications = await this.notificationService.addNotification(
-                req.body
-            );
-            
-            res.status(200);
-            res.locals.data = addedNotifications;
             next();
         }catch (error) {
             next(error)
@@ -53,7 +35,7 @@ class NotificationController {
         next: NextFunction
     ) => {
         try{
-            const notificationId = Number(req.params.id);
+            const notificationId = Number(req.params.notificationId);
             if (!Number.isInteger(notificationId))
                 throw new BadRequestException('Bad Request, invalid notification URL')
             const editedNotification = await this.notificationService.editNotification(
