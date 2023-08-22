@@ -1,6 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToMany, OneToMany, ManyToOne } from 'typeorm'
+import { Column, Entity, OneToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
-import Book from './book.entity'
 import BorrowedBook from './borrowed-book.entity'
 import BookShelfJn from './book-shelf-jn.entity'
 
