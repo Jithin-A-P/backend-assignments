@@ -29,13 +29,16 @@ class BookService {
   }
 
   public getBookById = async (id: number): Promise<Book> => {
-    const book = await this.bookRepository.findById(id, false)
+    const book = await this.bookRepository.findById(id, true)
     if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
 
-    const { isbn } = book 
-    const bookShelfJnEntries = await this.bookShelfJnRepository.getAllEntries(isbn)
+    const { bookShelfJns } = book
+    delete book['bookShelfJns']
 
-    book.shelves = bookShelfJnEntries as any
+    book.shelves = bookShelfJns.map((bookShelfJn) => ({
+      ...bookShelfJn.shelf,
+      availableBookCount: bookShelfJn.bookCount,
+    }))
 
     return book
   }
@@ -49,21 +52,20 @@ class BookService {
       0
     )
 
-    const { id: addedBookId, isbn: addedBookIsbn } =
-      await this.bookRepository.addBook({
-        ...(bookDto as any),
-        totalCount: totalCount,
-        availableCount: totalCount,
-      })
+    const addedBook = await this.bookRepository.addBook({
+      ...(bookDto as any),
+      totalCount: totalCount,
+      availableCount: totalCount,
+    })
 
-    this.bookShelfJnRepository.addEntries(
+    await this.bookShelfJnRepository.addEntries(
       shelves.map((shelf) => ({
         ...shelf,
-        bookIsbn: addedBookIsbn,
+        bookIsbn: addedBook.isbn,
       }))
     )
 
-    return await this.bookRepository.findById(addedBookId, true)
+    return addedBook
   }
 
   public updateBook = async (id: number, bookDto: BookDto): Promise<Book> => {
@@ -83,16 +85,15 @@ class BookService {
 
     const totalCount = currentBook.totalCount + availableCountDifference
 
-    const { id: updatedBookId, isbn: updatedBookIsbn } =
-      await this.bookRepository.updateBook({
-        ...currentBook,
-        ...(bookDto as any),
-        totalCount: totalCount,
-        availableCount: availableCount,
-      })
+    const updatedBook = await this.bookRepository.updateBook({
+      ...currentBook,
+      ...(bookDto as any),
+      totalCount: totalCount,
+      availableCount: availableCount,
+    })
 
     const currentShelves = await this.bookShelfJnRepository.getAllEntries(
-      updatedBookIsbn
+      updatedBook.isbn
     )
 
     this.bookShelfJnRepository.addEntries(
@@ -104,7 +105,7 @@ class BookService {
       }))
     )
 
-    return await this.bookRepository.findById(updatedBookId, true)
+    return updatedBook
   }
 
   public removeBook = async (id: number): Promise<Book> => {
