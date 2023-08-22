@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import BookShelfJn from './book-shelf-jn.entity'
 import BorrowedBook from './borrowed-book.entity'
+import Notification from './notification.entity'
 
 @Entity()
 class Book extends AbstractEntity {
@@ -34,6 +35,9 @@ class Book extends AbstractEntity {
 
   @Column()
   availableCount: number
+
+  @OneToMany(() => Notification, (notification) => notification.book)
+  notifications?: Notification[]
 
   @OneToMany(() => BookShelfJn, (bookShelfJn) => bookShelfJn.book)
   bookShelfJns?: BookShelfJn[]

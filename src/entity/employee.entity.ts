@@ -13,6 +13,7 @@ import AbstractEntity from './absract.entity'
 import Role from '../utils/role.enum'
 import Department from './department.entity'
 import Status from '../utils/status.enum'
+import Notification from './notification.entity'
 import BorrowedBook from './borrowed-book.entity'
 
 @Entity('employee')
@@ -47,6 +48,9 @@ class Employee extends AbstractEntity {
 
   @OneToOne(() => Address, (address) => address.employee, { cascade: true })
   address: Address
+
+  @OneToMany(() => Notification, (notification) => notification.employee)
+  notifications?: Notification[]
 
   @OneToMany(() => BorrowedBook, (borrowedBook) => borrowedBook.employee)
   borrowedBooks?: BorrowedBook[]

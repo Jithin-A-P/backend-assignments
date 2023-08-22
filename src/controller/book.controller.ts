@@ -16,8 +16,8 @@ class BookController {
     this.router.get('/:id', autheticate, this.getBookById)
     this.router.post(
       '/',
-      autheticate,
-      authorize([Role.ADMIN]),
+      // autheticate,
+      // authorize([Role.ADMIN]),
       validator(BookDto),
       this.addBook
     )

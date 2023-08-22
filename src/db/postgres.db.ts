@@ -10,6 +10,7 @@ import Book from '../entity/book.entity'
 import Shelf from '../entity/shelf.entity'
 import BookShelfJn from '../entity/book-shelf-jn.entity'
 import BorrowedBook from '../entity/borrowed-book.entity'
+import Notification from '../entity/notification.entity'
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -18,7 +19,7 @@ const dataSource = new DataSource({
   username: process.env.POSTGRES_USERNAME,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
-  entities: [Employee, Address, Department, Book, Shelf, BookShelfJn, BorrowedBook],
+  entities: [Employee, Address, Department, Book, Shelf, BookShelfJn, BorrowedBook, Notification],
   logging: false,
   namingStrategy: new SnakeNamingStrategy(),
   synchronize: false,
