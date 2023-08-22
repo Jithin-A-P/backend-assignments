@@ -29,8 +29,14 @@ class BookService {
   }
 
   public getBookById = async (id: number): Promise<Book> => {
-    const book = await this.bookRepository.findById(id, true)
+    const book = await this.bookRepository.findById(id, false)
     if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
+
+    const { isbn } = book 
+    const bookShelfJnEntries = await this.bookShelfJnRepository.getAllEntries(isbn)
+
+    book.shelves = bookShelfJnEntries as any
+
     return book
   }
 
