@@ -75,8 +75,9 @@ class EmployeeController {
         pageNumber
       )
 
+      res.locals.total = employees.pop()
+      res.locals.data = employees.pop()
       res.status(200)
-      res.locals.data = employees
       next()
     } catch (error) {
       next(error)

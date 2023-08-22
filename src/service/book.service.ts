@@ -22,7 +22,7 @@ class BookService {
     searchQuery: string,
     category: string,
     available: string
-  ): Promise<Book[]> => {
+  ): Promise<[Book[], number]> => {
     const defaultRowsPerPage = 15
     const take = rowsPerPage || defaultRowsPerPage
 

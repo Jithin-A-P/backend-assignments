@@ -4,8 +4,8 @@ import Book from '../entity/book.entity'
 class BookRepository {
   constructor(private bookRepository: Repository<Book>) {}
 
-  public findAll = (skip: number, take: number, filter: any): Promise<Book[]> => {
-    return this.bookRepository.find({
+  public findAll = (skip: number, take: number, filter: any): Promise<[Book[], number]> => {
+    return this.bookRepository.findAndCount({
       skip: skip,
       take: take,
       where: filter
