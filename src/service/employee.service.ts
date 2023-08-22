@@ -15,7 +15,7 @@ class EmployeeService {
   public getAllEmployees = (
     rowsPerPage: number,
     pageNumber: number
-  ): Promise<Employee[]> => {
+  ): Promise<[Employee[], number]> => {
     const defaultRowsPerPage = 15
     const take = rowsPerPage || defaultRowsPerPage
 

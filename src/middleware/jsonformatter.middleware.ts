@@ -7,14 +7,16 @@ const jsonFormatter = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.statusMessage = HttpStatusMessages[`CODE_${res.statusCode}`]
     const data = res.locals.data
+    const total = res.locals.total
+    const length = isArray(data) ? data.length : 1
     const responseBody = {
       data: data,
       message: res.statusMessage,
       errors: res.locals.errors,
       meta: {
-        length: isArray(data) ? data.length : 1,
+        length: length,
         took: new Date().getTime() - res.locals.startTime,
-        total: isArray(data) ? data.length : 1,
+        total: total || length,
       },
     }
     logger.log({

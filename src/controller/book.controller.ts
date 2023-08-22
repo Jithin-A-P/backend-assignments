@@ -69,8 +69,9 @@ class BookController {
         available as string
       )
       
+      res.locals.total = books.pop()
+      res.locals.data = books.pop()
       res.status(200)
-      res.locals.data = books
       next()
     } catch (error) {
       next(error)

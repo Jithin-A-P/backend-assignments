@@ -4,8 +4,8 @@ import Employee from '../entity/employee.entity'
 class EmployeeRepository {
   constructor(private employeeRepository: Repository<Employee>) {}
 
-  public findAll = (skip: number, take: number): Promise<Employee[]> => {
-    return this.employeeRepository.find({
+  public findAll = (skip: number, take: number): Promise<[Employee[], number]> => {
+    return this.employeeRepository.findAndCount({
       skip: skip,
       take: take,
     })
