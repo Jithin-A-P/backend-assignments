@@ -13,18 +13,25 @@ class BookRepository {
 
   public findById = (id: number, getShlefDetails: boolean): Promise<Book> => {
     return this.bookRepository.findOne({
-      where: { id: id },
       relations: {
-        shelves: getShlefDetails,
+        bookShelfJns: {
+          shelf: getShlefDetails,
+        }
       },
+      where: { id: id },
     })
   }
 
-  public findByISBN = (isbn: string, getShlefDetails: boolean): Promise<Book> => {
+  public findByISBN = (
+    isbn: string,
+    getShlefDetails: boolean
+  ): Promise<Book> => {
     return this.bookRepository.findOne({
       where: { isbn: isbn },
       relations: {
-        shelves: getShlefDetails,
+        bookShelfJns: {
+          shelf: getShlefDetails,
+        }
       },
     })
   }

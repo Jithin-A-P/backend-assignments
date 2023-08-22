@@ -1,6 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Shelf from './shelf.entity'
+import Employee from './employee.entity'
+import Book from './book.entity'
 
 @Entity()
 class BorrowedBook extends AbstractEntity {
@@ -29,6 +31,20 @@ class BorrowedBook extends AbstractEntity {
     referencedColumnName: 'shelfCode',
   })
   returnedTo?: Shelf
+
+  @ManyToOne(() => Book, (book) => book.borrowedBooks)
+  @JoinColumn({
+    name: 'book_isbn',
+    referencedColumnName: 'isbn'
+  })
+  book?: Book
+
+  @ManyToOne(() => Employee, (employee) => employee.borrowedBooks)
+  @JoinColumn({
+    name: 'employee_id',
+    referencedColumnName: 'id'
+  })
+  employee?: Employee
 
   @Column()
   borrowedAt: string

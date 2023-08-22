@@ -1,7 +1,7 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm'
+import { Column, Entity, OneToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
-import Shelf from './shelf.entity'
-import Employee from './employee.entity'
+import BookShelfJn from './book-shelf-jn.entity'
+import BorrowedBook from './borrowed-book.entity'
 import Notification from './notification.entity'
 
 @Entity()
@@ -36,25 +36,16 @@ class Book extends AbstractEntity {
   @Column()
   availableCount: number
 
-  @ManyToMany(() => Shelf, (shelf) => shelf.books)
-  @JoinTable({
-    name: 'book_shelf_jn',
-    joinColumn: {
-      name: 'book_isbn',
-      referencedColumnName: 'isbn',
-    },
-    inverseJoinColumn: {
-      name: 'shelf_code',
-      referencedColumnName: 'shelfCode'
-    }
-  })
-  shelves?: Shelf[]
-
-  @ManyToMany(() => Employee, (employee) => employee.borrowedBooks)
-  borrowedByEmployees?: Employee[]
-
   @OneToMany(() => Notification, (notification) => notification.book)
   notifications?: Notification[]
+
+  @OneToMany(() => BookShelfJn, (bookShelfJn) => bookShelfJn.book)
+  bookShelfJns?: BookShelfJn[]
+
+  @OneToMany(() => BorrowedBook, (borrowedBook) => borrowedBook.book)
+  borrowedBooks?: BorrowedBook[]
+
+  shelves?: any[]
 }
 
 export default Book
