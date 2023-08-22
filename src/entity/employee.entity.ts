@@ -5,6 +5,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
 } from 'typeorm'
 import Address from './address.entity'
@@ -13,6 +14,7 @@ import Role from '../utils/role.enum'
 import Department from './department.entity'
 import Status from '../utils/status.enum'
 import Book from './book.entity'
+import Notification from './notification.entity'
 
 @Entity('employee')
 class Employee extends AbstractEntity {
@@ -60,6 +62,9 @@ class Employee extends AbstractEntity {
     },
   })
   borrowedBooks?: Book[]
+
+  @OneToMany(() => Notification, (notification) => notification.employee)
+  notifications?: Notification[]
 }
 
 export default Employee

@@ -1,7 +1,8 @@
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm'
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Shelf from './shelf.entity'
 import Employee from './employee.entity'
+import Notification from './notification.entity'
 
 @Entity()
 class Book extends AbstractEntity {
@@ -51,6 +52,9 @@ class Book extends AbstractEntity {
 
   @ManyToMany(() => Employee, (employee) => employee.borrowedBooks)
   borrowedByEmployees?: Employee[]
+
+  @OneToMany(() => Notification, (notification) => notification.book)
+  notifications?: Notification[]
 }
 
 export default Book
