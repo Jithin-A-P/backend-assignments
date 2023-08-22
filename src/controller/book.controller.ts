@@ -7,6 +7,7 @@ import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import BadRequestException from '../exception/bad-request.exception'
+import SubscriptionDto from '../dto/subscription.dto'
 
 class BookController {
   public router: Router
@@ -32,7 +33,13 @@ class BookController {
       autheticate,
       validator(BorrowBookDto),
       this.returnBook
-    )
+    ),
+    this.router.post(
+      '/:isbn/subscribe',
+      autheticate,
+      validator(SubscriptionDto),
+      this.addSubscription
+    ),
     this.router.put(
       '/:id',
       autheticate,
@@ -95,6 +102,17 @@ class BookController {
       const addedBook = await this.bookService.addBook(req.body)
       res.status(201)
       res.locals.data = addedBook
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  private addSubscription = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const newSubscription = await this.bookService.addSubscription(req.body)
+      res.status(201)
+      res.locals.data = newSubscription
       next()
     } catch (error) {
       next(error)
