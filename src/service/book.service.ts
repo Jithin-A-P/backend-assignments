@@ -7,6 +7,7 @@ import BorrowedBookRepository from '../repository/borrowed-book.repository'
 import BorrowBookDto from '../dto/borrow-book.dto'
 import BorrowedBook from '../entity/borrowed-book.entity'
 import BadRequestException from '../exception/bad-request.exception'
+import { ILike, MoreThan } from 'typeorm'
 
 class BookService {
   constructor(
@@ -17,7 +18,10 @@ class BookService {
 
   public getAllBooks = (
     rowsPerPage: number,
-    pageNumber: number
+    pageNumber: number,
+    searchQuery: string,
+    category: string,
+    available: string
   ): Promise<Book[]> => {
     const defaultRowsPerPage = 15
     const take = rowsPerPage || defaultRowsPerPage
@@ -25,7 +29,21 @@ class BookService {
     const rowsToSkip = (pageNumber - 1) * take
     const skip = rowsToSkip > 0 ? rowsToSkip : 0
 
-    return this.bookRepository.findAll(skip, take)
+    const filters = {}
+      
+    if(category)
+      filters['category'] = ILike(`%${category}%`)
+    
+    if(available)
+      filters['availableCount'] = MoreThan(0)
+
+    const searchFilter = [
+      { ...filters, isbn: ILike(`%${searchQuery || '%'}%`) },
+      { ...filters, title: ILike(`%${searchQuery || '%'}%`) },
+      { ...filters, author: ILike(`%${searchQuery || '%'}%`) },
+    ]
+    
+    return this.bookRepository.findAll(skip, take, searchFilter)
   }
 
   public getBookById = async (id: number): Promise<Book> => {

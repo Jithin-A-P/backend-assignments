@@ -4,18 +4,19 @@ import Book from '../entity/book.entity'
 class BookRepository {
   constructor(private bookRepository: Repository<Book>) {}
 
-  public findAll = (skip: number, take: number): Promise<Book[]> => {
+  public findAll = (skip: number, take: number, filter: any): Promise<Book[]> => {
     return this.bookRepository.find({
       skip: skip,
       take: take,
+      where: filter
     })
   }
 
-  public findById = (id: number, getShlefDetails: boolean): Promise<Book> => {
+  public findById = (id: number, getShelfDetails: boolean): Promise<Book> => {
     return this.bookRepository.findOne({
       relations: {
         bookShelfJns: {
-          shelf: getShlefDetails,
+          shelf: getShelfDetails,
         }
       },
       where: { id: id },
