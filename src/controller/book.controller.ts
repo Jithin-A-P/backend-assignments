@@ -54,7 +54,14 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const books = await this.bookService.getAllBooks()
+      const rowsPerPage = Number(req.query.rowsPerPage)
+      const pageNumber = Number(req.query.pageNumber)
+
+      const books = await this.bookService.getAllBooks(
+        rowsPerPage,
+        pageNumber
+      )
+      
       res.status(200)
       res.locals.data = books
       next()

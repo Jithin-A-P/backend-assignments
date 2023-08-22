@@ -15,8 +15,17 @@ class BookService {
     private borrowedBookRepository: BorrowedBookRepository
   ) {}
 
-  public getAllBooks = (): Promise<Book[]> => {
-    return this.bookRepository.findAll()
+  public getAllBooks = (
+    rowsPerPage: number,
+    pageNumber: number
+  ): Promise<Book[]> => {
+    const defaultRowsPerPage = 15
+    const take = rowsPerPage || defaultRowsPerPage
+
+    const rowsToSkip = (pageNumber - 1) * take
+    const skip = rowsToSkip > 0 ? rowsToSkip : 0
+
+    return this.bookRepository.findAll(skip, take)
   }
 
   public getBookById = async (id: number): Promise<Book> => {
