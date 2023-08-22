@@ -1,49 +1,46 @@
-import { Repository } from "typeorm";
-import Shelf from "../entity/shelf.entity";
+import { Repository } from 'typeorm'
+import Shelf from '../entity/shelf.entity'
 
 class ShelfRepository {
-    constructor(private shelfRepository: Repository<Shelf>) {}
+  constructor(private shelfRepository: Repository<Shelf>) {}
 
-    // public findAll = (skip: number, take: number): Promise<Shelf[]> => {
-    //     return this.shelfRepository.find({
-    //         skip: skip,
-    //         take: take,
-    //     })
-    // }
+  public findAll = (): Promise<Shelf[]> => {
+    return this.shelfRepository.find()
+  }
 
-    public findAll = (): Promise<Shelf[]> => {
-        return this.shelfRepository.find()
-    }
+  public findById = (id: number): Promise<Shelf> => {
+    return this.shelfRepository.findOne({
+      where: { id: id },
+      relations: {
+        bookShelfJns: {
+          book: true,
+        },
+      },
+    })
+  }
 
-    public findById = (id: number): Promise<Shelf> => {
-        return this.shelfRepository.findOne({
-            where: {id: id},
-            relations: {
-                books: true,
-            }
-        })
-    }
+  public findByShelfCode = (shelfCode: string): Promise<Shelf> => {
+    return this.shelfRepository.findOne({
+      where: { shelfCode: shelfCode },
+      relations: {
+        bookShelfJns: {
+          book: true,
+        },
+      },
+    })
+  }
 
-    public findByShelfCode = (shelfCode: string): Promise<Shelf> => {
-        return this.shelfRepository.findOne({
-            where: {shelfCode: shelfCode},
-            relations: {
-                books: true,
-            }
-        })
-    }
+  public add = (shelf: Shelf): Promise<Shelf> => {
+    return this.shelfRepository.save(shelf)
+  }
 
-    public add = (shelf: Shelf): Promise<Shelf> => {
-        return this.shelfRepository.save(shelf);
-    }
+  public remove = (shelf: Shelf): Promise<Shelf> => {
+    return this.shelfRepository.softRemove(shelf)
+  }
 
-    public remove = (shelf: Shelf): Promise<Shelf> => {
-        return this.shelfRepository.softRemove(shelf);
-    }
-
-    public update = (shelf: Shelf): Promise<Shelf> => {
-        return this.shelfRepository.save(shelf);
-    }
+  public update = (shelf: Shelf): Promise<Shelf> => {
+    return this.shelfRepository.save(shelf)
+  }
 }
 
-export default ShelfRepository;
+export default ShelfRepository
