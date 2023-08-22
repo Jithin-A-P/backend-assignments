@@ -9,7 +9,7 @@ class NotificationController {
     constructor(private notificationService: NotificationService) {
         this.router = Router()
         this.router.get('/:employeeId', this.getNotifications)
-        this.router.patch('/:notificationId',validator(NotificationDto), this.editNotifications)
+        this.router.patch('/:notificationId', this.editNotifications)
     }
 
     private getNotifications = async(
