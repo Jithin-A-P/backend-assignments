@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import BookService from '../service/book.service'
-import HttpException from '../exception/http.exception'
 import BookDto from '../dto/book.dto'
 import validator from '../middleware/validator.middleware'
 import BorrowBookDto from '../dto/borrow-book.dto'
 import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
+import BadRequestException from '../exception/bad-request.exception'
 
 class BookController {
   public router: Router
@@ -71,7 +71,7 @@ class BookController {
     try {
       const bookId = Number(req.params.id)
       if (!Number.isInteger(bookId))
-        throw new HttpException(400, 'Bad Request, invalid book URL')
+        throw new BadRequestException('Bad Request, invalid book URL')
 
       const book = await this.bookService.getBookById(bookId)
       res.status(200)
@@ -138,7 +138,7 @@ class BookController {
     try {
       const bookId = Number(req.params.id)
       if (!Number.isInteger(bookId))
-        throw new HttpException(400, 'Bad Request, invalid book URL')
+        throw new BadRequestException('Bad Request, invalid book URL')
 
       const updatedBook = await this.bookService.updateBook(bookId, req.body)
       res.status(200)
@@ -157,7 +157,7 @@ class BookController {
     try {
       const bookId = Number(req.params.id)
       if (!Number.isInteger(bookId))
-        throw new HttpException(400, 'Bad Request, invalid book URL')
+        throw new BadRequestException('Bad Request, invalid book URL')
 
       const editedBook = await this.bookService.removeBook(bookId)
       res.status(204)

@@ -6,7 +6,7 @@ import Book from '../entity/book.entity'
 import BorrowedBookRepository from '../repository/borrowed-book.repository'
 import BorrowBookDto from '../dto/borrow-book.dto'
 import BorrowedBook from '../entity/borrowed-book.entity'
-import HttpException from '../exception/http.exception'
+import BadRequestException from '../exception/bad-request.exception'
 
 class BookService {
   constructor(
@@ -112,7 +112,7 @@ class BookService {
       )
 
     if (book.availableCount === 0)
-      throw new HttpException(400, 'Requested book not available')
+      throw new BadRequestException('Requested book not available')
 
     const { shelfCode, employeeId } = borrowBookDto
 
@@ -122,7 +122,7 @@ class BookService {
     )
 
     if (bookShelfEntry.bookCount === 0)
-      throw new HttpException(400, 'Requested book not available on the shelf')
+      throw new BadRequestException('Requested book not available on the shelf')
 
     const borrowedBook = await this.borrowedBookRepository.addBorrowedBook({
       bookIsbn: bookIsbn,
@@ -166,10 +166,10 @@ class BookService {
     })
 
     if (!borrowedBook)
-      throw new HttpException(400, "Employee hasn't borrowed this book")
+      throw new BadRequestException("Employee hasn't borrowed this book")
 
     if (borrowedBook.returnedAt)
-      throw new HttpException(400, 'Book was already returned')
+      throw new BadRequestException('Book was already returned')
 
     const updatedBorrowedBook =
       await this.borrowedBookRepository.updateBorrowedBook({

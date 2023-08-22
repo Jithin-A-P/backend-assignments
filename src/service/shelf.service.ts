@@ -2,7 +2,7 @@ import EditShelfDto from "../dto/edit-shelf.dto";
 import ShelfDto from "../dto/shelf.dto";
 import Book from "../entity/book.entity";
 import Shelf from "../entity/shelf.entity";
-import HttpException from "../exception/http.exception";
+import BadRequestException from '../exception/bad-request.exception'
 import NotFoundException from "../exception/not-found.exception";
 import ShelfRepository from "../repository/shelf.repository";
 
@@ -43,7 +43,7 @@ class ShelfService {
     if (!shelf) throw new NotFoundException(`Shelf not found with id: ${id}`);
 
     if (shelf.books.length > 0)
-      throw new HttpException(400, "Cannot delete shelf with books");
+      throw new BadRequestException("Cannot delete shelf with books");
     return this.shelfRepository.remove(shelf);
   };
 
@@ -55,7 +55,7 @@ class ShelfService {
     if (!shelf) throw new NotFoundException(`Shelf not found with id: ${id}`);
 
     for (const key in editShelfDto)
-      if (!(key in shelf)) throw new HttpException(400, `Bad Request`);
+      if (!(key in shelf)) throw new BadRequestException(`Bad Request`);
 
     const editedShelf = await this.shelfRepository.update({
       ...shelf,

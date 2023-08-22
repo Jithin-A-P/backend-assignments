@@ -6,7 +6,7 @@ import DepartmentService from '../service/department.service'
 import DepartmentDto from '../dto/department.dto'
 import validator from '../middleware/validator.middleware'
 import EditDepartmentDto from '../dto/edit-department.dto'
-import HttpException from '../exception/http.exception'
+import BadRequestException from '../exception/bad-request.exception'
 
 class DepartmentController {
   public router: Router
@@ -67,7 +67,7 @@ class DepartmentController {
     try {
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
-        throw new HttpException(400, 'Bad Request, invalid department URL')
+        throw new BadRequestException('Bad Request, invalid department URL')
 
       const department = await this.departmentService.getDepartmentById(
         departmentId
@@ -89,7 +89,7 @@ class DepartmentController {
     try {
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
-        throw new HttpException(400, 'Bad Request, invalid department URL')
+        throw new BadRequestException('Bad Request, invalid department URL')
 
       const department = await this.departmentService.editDepartment(
         departmentId,
@@ -131,7 +131,7 @@ class DepartmentController {
     try {
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
-        throw new HttpException(400, 'Bad Request, invalid department URL')
+        throw new BadRequestException('Bad Request, invalid department URL')
 
       const updatedDepartment = await this.departmentService.updateDepartment(
         departmentId,
@@ -155,7 +155,7 @@ class DepartmentController {
     try {
       const departmentId = Number(req.params.id)
       if (!Number.isInteger(departmentId))
-        throw new HttpException(400, 'Bad Request, invalid department URL')
+        throw new BadRequestException('Bad Request, invalid department URL')
 
       await this.departmentService.removeDepartmentById(departmentId)
       res.status(204)

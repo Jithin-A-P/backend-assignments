@@ -7,6 +7,7 @@ import LoginDto from '../dto/login.dto'
 import NotFoundException from '../exception/not-found.exception'
 import EditEmployeeDto from '../dto/edit-employee.dto'
 import EmployeeDto from '../dto/employee.dto'
+import BadRequestException from '../exception/bad-request.exception'
 
 class EmployeeService {
   constructor(private employeeRepository: EmployeeRepository) {}
@@ -41,7 +42,7 @@ class EmployeeService {
 
     for (const key in editEmployeeDto)
       if (!(key in employee))
-        throw new HttpException(400, `Bad Request, ${key} is not expeted`)
+        throw new BadRequestException(`Bad Request, ${key} is not expeted`)
 
     const editedEmployee = await this.employeeRepository.update({
       ...employee,

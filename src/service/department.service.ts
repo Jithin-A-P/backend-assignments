@@ -1,9 +1,9 @@
 import DepartmentDto from '../dto/department.dto'
 import EditDepartmentDto from '../dto/edit-department.dto'
 import Department from '../entity/department.entity'
-import HttpException from '../exception/http.exception'
 import NotFoundException from '../exception/not-found.exception'
 import DepartmentRepository from '../repository/department.repository'
+import BadRequestException from '../exception/bad-request.exception'
 
 class DepartmentService {
   constructor(private departmentRepository: DepartmentRepository) {}
@@ -35,7 +35,7 @@ class DepartmentService {
       throw new NotFoundException(`Department not found with id: ${id}`)
 
     for (const key in editDepartmentDto)
-      if (!(key in department)) throw new HttpException(400, 'Bad Request')
+      if (!(key in department)) throw new BadRequestException('Bad Request')
 
     const editedDepartment = await this.departmentRepository.update({
       ...department,
@@ -52,7 +52,7 @@ class DepartmentService {
       throw new NotFoundException(`Department not found with id: ${id}`)
 
     if (department.employees.length > 0)
-      throw new HttpException(400, 'Cannot delete department with employees')
+      throw new BadRequestException('Cannot delete department with employees')
 
     return this.departmentRepository.remove(department)
   }
