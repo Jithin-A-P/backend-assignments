@@ -59,17 +59,21 @@ class BookService {
     const { shelves } = bookDto
     delete bookDto['shelves']
 
-    const totalCount = shelves.reduce(
+    const availableCount = shelves.reduce(
       (total, shelf) => total + shelf.bookCount,
       0
     )
+
+    const availableCountDifference = availableCount - currentBook.availableCount
+
+    const totalCount = currentBook.totalCount + availableCountDifference
 
     const { id: updatedBookId, isbn: updatedBookIsbn } =
       await this.bookRepository.updateBook({
         ...currentBook,
         ...(bookDto as any),
         totalCount: totalCount,
-        availableCount: totalCount,
+        availableCount: availableCount,
       })
 
     const currentShelves = await this.bookShelfJnRepository.getAllEntries(
@@ -95,9 +99,9 @@ class BookService {
     const bookShelfJnEntries = await this.bookShelfJnRepository.getAllEntries(
       book.isbn
     )
-    this.bookShelfJnRepository.removeEntries(bookShelfJnEntries)
+    await this.bookShelfJnRepository.removeEntries(bookShelfJnEntries)
 
-    return this.bookRepository.removeBook(book)
+    return await this.bookRepository.removeBook(book)
   }
 
   public borrowBook = async (
