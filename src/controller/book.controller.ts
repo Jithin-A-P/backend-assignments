@@ -57,9 +57,16 @@ class BookController {
       const rowsPerPage = Number(req.query.rowsPerPage)
       const pageNumber = Number(req.query.pageNumber)
 
+      const searchQuery = req.query.searchQuery
+      const category = req.query.category
+      const available = req.query.available
+
       const books = await this.bookService.getAllBooks(
         rowsPerPage,
-        pageNumber
+        pageNumber,
+        searchQuery as string,
+        category as string,
+        available as string
       )
       
       res.status(200)
