@@ -1,5 +1,6 @@
 import { Repository } from "typeorm";
 import Shelf from "../entity/shelf.entity";
+import BookShelfJn from "../entity/book-shelf-jn.entity";
 
 class ShelfRepository {
     constructor(private shelfRepository: Repository<Shelf>) {}
