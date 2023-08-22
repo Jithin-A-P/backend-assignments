@@ -17,8 +17,8 @@ class BookController {
     this.router.get('/:id', autheticate, this.getBookById)
     this.router.post(
       '/',
-      // autheticate,
-      // authorize([Role.ADMIN]),
+      autheticate,
+      authorize([Role.ADMIN]),
       validator(BookDto),
       this.addBook
     )
@@ -35,7 +35,7 @@ class BookController {
       this.returnBook
     ),
     this.router.post(
-      '/:isbn/subscribe',
+      '/:id/subscribe',
       autheticate,
       validator(SubscriptionDto),
       this.addSubscription

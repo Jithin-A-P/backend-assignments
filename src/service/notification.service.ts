@@ -1,29 +1,43 @@
-import NotificationDto from "../dto/notification.dto";
-import Notification from "../entity/notification.entity";
-import NotFoundException from "../exception/not-found.exception";
-import NotificationRepository from "../repository/notification.repository";
+import EditNotificationDto from '../dto/edit-notification.dto'
+import Notification from '../entity/notification.entity'
+import NotFoundException from '../exception/not-found.exception'
+import NotificationRepository from '../repository/notification.repository'
 
 class NotificationService {
-    constructor(private notificationRepository: NotificationRepository) {}
+  constructor(private notificationRepository: NotificationRepository) {}
 
-    public getNotification = (id: number): Promise<Notification[]> => {
-        return this.notificationRepository.findUnread(id);
-    }
+  public getNotification = async (id: number): Promise<Notification[]> => {
+    const notifications = await this.notificationRepository.findUnread(id)
+    if (!notifications || notifications.length == 0) throw new NotFoundException('No notifications found')
 
-    public addNotification = (notification: NotificationDto):Promise<Notification> => {
-        return this.notificationRepository.addNotification(notification as Notification)
-    }
+    return notifications
+  }
 
-    public editNotification = async (id: number, notificationDto: Notification):Promise<Notification> => {
-        const notification = await this.notificationRepository.findById(id);
+  public addNotification = async (
+    notification: Notification
+  ): Promise<Notification> => {
+    return await this.notificationRepository.addNotification(notification)
+  }
 
-        if(!notification)
-        throw new NotFoundException(`Notification not found with id: ${id}`)
+  public addNotifications = async (
+    notifications: Notification[]
+  ): Promise<Notification[]> => {
+    return await this.notificationRepository.addNotifications(notifications)
+  }
 
-        notification.status = 'read';
-        
-        return this.notificationRepository.updateNotification(notification);
-    }
+  public editNotification = async (
+    id: number,
+    editNotificationDto: EditNotificationDto
+  ): Promise<Notification> => {
+    const notification = await this.notificationRepository.findById(id)
+
+    if (!notification)
+      throw new NotFoundException(`Notification not found with id: ${id}`)
+
+    notification.status = editNotificationDto.status
+
+    return await this.notificationRepository.updateNotification(notification)
+  }
 }
 
-export default NotificationService;
+export default NotificationService

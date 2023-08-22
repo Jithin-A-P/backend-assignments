@@ -13,6 +13,7 @@ import SubscriptionRepository from '../repository/subscription.repository'
 import Subscription from '../entity/subscription.entity'
 import EmployeeRepository from '../repository/employee.repository'
 import Employee from '../entity/employee.entity'
+import NotificationService from '../service/notification.service'
 
 const bookRepository = new BookRepository(dataSource.getRepository(Book))
 const bookShelfJnRepository = new BookShelfJnRepository(
@@ -24,19 +25,23 @@ const borrowedBookRepository = new BorrowedBookRepository(
 const notificationRepository = new NotificationRepository(
   dataSource.getRepository(Notification)
 )
+const notificationService = new NotificationService(
+  notificationRepository
+)
 const subscriptionRepository = new SubscriptionRepository(
   dataSource.getRepository(Subscription)
 )
 const employeeRepository = new EmployeeRepository(
   dataSource.getRepository(Employee)
 )
+
 const bookService = new BookService(
   bookRepository,
   bookShelfJnRepository,
   borrowedBookRepository,
-  notificationRepository,
   subscriptionRepository,
-  employeeRepository
+  employeeRepository,
+  notificationService
 )
 const bookController = new BookController(bookService)
 const bookRoute = bookController.router
