@@ -14,7 +14,7 @@ class BookShelfJn extends AbstractEntity {
   @Column()
   bookCount: number
 
-  @ManyToOne(() => Shelf, (shelf) => shelf.bookShelfJn)
+  @ManyToOne(() => Shelf, (shelf) => shelf.bookShelfJns)
   @JoinColumn({
     name: 'shelf_code',
     referencedColumnName: 'shelfCode',

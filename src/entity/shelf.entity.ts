@@ -13,13 +13,15 @@ class Shelf extends AbstractEntity {
   location: string
 
   @OneToMany(() => BookShelfJn, (bookShelfJn) => bookShelfJn.shelf)
-  bookShelfJn?: BookShelfJn[]
+  bookShelfJns?: BookShelfJn[]
 
   @OneToMany(() => BorrowedBook, (borrowedBook) => borrowedBook.borrowedFrom)
   borrowedBooks?: BorrowedBook[]
 
   @OneToMany(() => BorrowedBook, (borrowedBook) => borrowedBook.returnedTo)
   returnedBooks?: BorrowedBook[]
+
+  books?: any[]
 }
 
 export default Shelf
