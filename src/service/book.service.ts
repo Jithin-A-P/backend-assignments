@@ -15,6 +15,7 @@ import Notification from "../entity/notification.entity";
 import EmployeeRepository from "../repository/employee.repository";
 import NotificationStatus from "../utils/notification-status.enum";
 import NotificationType from "../utils/notification-type.enum";
+import { ILike, MoreThan } from 'typeorm';
 
 class BookService {
   constructor(
@@ -28,16 +29,34 @@ class BookService {
 
   public getAllBooks = (
     rowsPerPage: number,
-    pageNumber: number
-  ): Promise<Book[]> => {
-    const defaultRowsPerPage = 15;
-    const take = rowsPerPage || defaultRowsPerPage;
+    pageNumber: number,
+    searchQuery: string,
+    category: string,
+    available: string
+  ): Promise<[Book[], number]> => {
+    const defaultRowsPerPage = 15
+    const take = rowsPerPage || defaultRowsPerPage
 
     const rowsToSkip = (pageNumber - 1) * take;
     const skip = rowsToSkip > 0 ? rowsToSkip : 0;
 
-    return this.bookRepository.findAll(skip, take);
-  };
+    const filters = {}
+      
+    if(category)
+      filters['category'] = ILike(`%${category}%`)
+    
+    if(available)
+      filters['availableCount'] = MoreThan(0)
+
+    const searchFilter = [
+      { ...filters, isbn: ILike(`%${searchQuery || '%'}%`) },
+      { ...filters, title: ILike(`%${searchQuery || '%'}%`) },
+      { ...filters, author: ILike(`%${searchQuery || '%'}%`) },
+    ]
+    
+    return this.bookRepository.findAll(skip, take, searchFilter)
+  }
+
 
   public getBookById = async (id: number): Promise<Book> => {
     const book = await this.bookRepository.findById(id, true);
@@ -239,18 +258,19 @@ class BookService {
     const newSubscription =
       await this.subscriptionRepository.createSubscription(subscriptionDto);
     
-    if (subscriptionDto.requestedTo)
-    {
-      const newNotification = new Notification();
-      newNotification.bookIsbn = subscriptionDto.bookISBN;
+    if (subscriptionDto.requestedTo) {      
       const { name } = await this.employeeRepository.findById(subscriptionDto.requestedBy);
       const { title } = await this.bookRepository.findByISBN(subscriptionDto.bookISBN, false);
+      
+      const newNotification = new Notification();
+      newNotification.bookIsbn = subscriptionDto.bookISBN;
       newNotification.content = `${name} has requested for ${title}.`;
       newNotification.employeeId = subscriptionDto.requestedTo;
       newNotification.status = NotificationStatus.UNREAD;
       newNotification.type = NotificationType.REQUEST;
-      const addedNotification = await this.notificationRepository.addNotification(newNotification);
+      await this.notificationRepository.addNotification(newNotification);
     }
+    
     return newSubscription;
   };
 }
