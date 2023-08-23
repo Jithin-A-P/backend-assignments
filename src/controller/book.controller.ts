@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import { isUUID } from 'class-validator'
+import { UploadedFile } from 'express-fileupload'
 import BookService from '../service/book.service'
 import BookDto from '../dto/book.dto'
 import validateBody from '../middleware/validate-body.middleware'
@@ -24,6 +25,13 @@ class BookController {
       this.addBook
     )
     this.router.post(
+      '/upload',
+      autheticate,
+      authorize([Role.ADMIN]),
+      validateBody(BookDto),
+      this.blukAddBooks
+    )
+    this.router.post(
       '/:isbn/lend',
       autheticate,
       validateBody(BorrowBookDto),
@@ -35,19 +43,19 @@ class BookController {
       validateBody(BorrowBookDto),
       this.returnBook
     ),
-    this.router.post(
-      '/:id/subscribe',
-      autheticate,
-      validateBody(SubscriptionDto),
-      this.addSubscription
-    ),
-    this.router.put(
-      '/:id',
-      autheticate,
-      authorize([Role.ADMIN]),
-      validateBody(BookDto),
-      this.updateBook
-    )
+      this.router.post(
+        '/:id/subscribe',
+        autheticate,
+        validateBody(SubscriptionDto),
+        this.addSubscription
+      ),
+      this.router.put(
+        '/:id',
+        autheticate,
+        authorize([Role.ADMIN]),
+        validateBody(BookDto),
+        this.updateBook
+      )
     this.router.delete(
       '/:id',
       autheticate,
@@ -110,6 +118,22 @@ class BookController {
       const addedBook = await this.bookService.addBook(req.body)
       res.status(201)
       res.locals.data = addedBook
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  private blukAddBooks = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const file = req.files.data as UploadedFile
+
+      res.status(201)
+      res.locals.data = await this.bookService.bulkAddBook(file)
       next()
     } catch (error) {
       next(error)
