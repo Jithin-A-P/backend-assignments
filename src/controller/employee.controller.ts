@@ -7,7 +7,6 @@ import validator from '../middleware/validator.middleware'
 import Role from '../utils/role.enum'
 import LoginDto from '../dto/login.dto'
 import EditEmployeeDto from '../dto/edit-employee.dto'
-import BadRequestException from '../exception/bad-request.exception'
 
 class EmployeeController {
   public router: Router
@@ -90,10 +89,7 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const employeeId = Number(req.params.id)
-      if (!Number.isInteger(employeeId))
-        throw new BadRequestException('Bad Request, invalid employee URL')
-
+      const employeeId = req.params.id
       const employee = await this.employeeService.getEmployeeById(employeeId)
       res.status(200)
       res.locals.data = employee
@@ -109,9 +105,7 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const employeeId = Number(req.params.id)
-      if (!Number.isInteger(employeeId))
-        throw new BadRequestException('Bad Request, invalid employee URL')
+      const employeeId = req.params.id
 
       const employee = await this.employeeService.editEmployee(
         employeeId,
@@ -132,9 +126,7 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const employeeId = Number(req.params.id)
-      if (!Number.isInteger(employeeId))
-        throw new BadRequestException('Bad Request, invalid employee URL')
+      const employeeId = req.params.id
 
       const updatedEmployee = await this.employeeService.updateEmployee(
         employeeId,
@@ -155,9 +147,7 @@ class EmployeeController {
     next: NextFunction
   ) => {
     try {
-      const employeeId = Number(req.params.id)
-      if (!Number.isInteger(employeeId))
-        throw new BadRequestException('Bad Request, invalid employee URL')
+      const employeeId = req.params.id
 
       await this.employeeService.removeEmployeeById(employeeId)
 

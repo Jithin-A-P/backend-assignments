@@ -6,7 +6,6 @@ import DepartmentService from '../service/department.service'
 import DepartmentDto from '../dto/department.dto'
 import validator from '../middleware/validator.middleware'
 import EditDepartmentDto from '../dto/edit-department.dto'
-import BadRequestException from '../exception/bad-request.exception'
 
 class DepartmentController {
   public router: Router
@@ -65,9 +64,7 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const departmentId = Number(req.params.id)
-      if (!Number.isInteger(departmentId))
-        throw new BadRequestException('Bad Request, invalid department URL')
+      const departmentId = req.params.id
 
       const department = await this.departmentService.getDepartmentById(
         departmentId
@@ -87,9 +84,7 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const departmentId = Number(req.params.id)
-      if (!Number.isInteger(departmentId))
-        throw new BadRequestException('Bad Request, invalid department URL')
+      const departmentId = req.params.id
 
       const department = await this.departmentService.editDepartment(
         departmentId,
@@ -129,9 +124,7 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const departmentId = Number(req.params.id)
-      if (!Number.isInteger(departmentId))
-        throw new BadRequestException('Bad Request, invalid department URL')
+      const departmentId = req.params.id
 
       const updatedDepartment = await this.departmentService.updateDepartment(
         departmentId,
@@ -153,9 +146,7 @@ class DepartmentController {
     next: NextFunction
   ) => {
     try {
-      const departmentId = Number(req.params.id)
-      if (!Number.isInteger(departmentId))
-        throw new BadRequestException('Bad Request, invalid department URL')
+      const departmentId = req.params.id
 
       await this.departmentService.removeDepartmentById(departmentId)
       res.status(204)

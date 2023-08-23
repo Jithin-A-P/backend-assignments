@@ -1,3 +1,4 @@
+import { ILike, IsNull, MoreThan } from 'typeorm'
 import NotFoundException from '../exception/not-found.exception'
 import BookDto from '../dto/book.dto'
 import BookRepository from '../repository/book.repository'
@@ -7,7 +8,6 @@ import BorrowedBookRepository from '../repository/borrowed-book.repository'
 import BorrowBookDto from '../dto/borrow-book.dto'
 import BorrowedBook from '../entity/borrowed-book.entity'
 import BadRequestException from '../exception/bad-request.exception'
-import { ILike, IsNull, MoreThan } from 'typeorm'
 import SubscriptionDto from '../dto/subscription.dto'
 import Subscription from '../entity/subscription.entity'
 import SubscriptionRepository from '../repository/subscription.repository'
@@ -16,7 +16,7 @@ import EmployeeRepository from '../repository/employee.repository'
 import NotificationStatus from '../utils/notification-status.enum'
 import NotificationType from '../utils/notification-type.enum'
 import NotificationService from './notification.service'
-import SubscriptionStatus from '../utils/subscription.status.enum'
+import SubscriptionStatus from '../utils/subscription-status.enum'
 
 class BookService {
   constructor(
@@ -56,7 +56,7 @@ class BookService {
     return this.bookRepository.findAll(skip, take, searchFilter)
   }
 
-  public getBookById = async (id: number): Promise<Book> => {
+  public getBookById = async (id: string): Promise<Book> => {
     const book = await this.bookRepository.findById(id, true)
     if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
 
@@ -89,22 +89,22 @@ class BookService {
     await this.bookShelfJnRepository.addEntries(
       shelves.map((shelf) => ({
         ...shelf,
-        bookIsbn: addedBook.isbn,
+        bookIsbn: bookDto.isbn,
       }))
     )
 
     return addedBook
   }
 
-  public updateBook = async (id: number, bookDto: BookDto): Promise<Book> => {
+  public updateBook = async (id: string, bookDto: BookDto): Promise<Book> => {
     const currentBook = await this.bookRepository.findById(id, false)
     if (!currentBook)
       throw new NotFoundException(`Book not found with id: ${id}`)
 
-    const { shelves } = bookDto
+    const { shelves: updatedShelves } = bookDto
     delete bookDto['shelves']
 
-    const availableCount = shelves.reduce(
+    const availableCount = updatedShelves.reduce(
       (total, shelf) => total + shelf.bookCount,
       0
     )
@@ -120,25 +120,28 @@ class BookService {
       availableCount: availableCount,
     })
 
-    const currentShelves = await this.bookShelfJnRepository.getAllEntries(
+    const currentShelfEtries = await this.bookShelfJnRepository.getAllEntries(
       updatedBook.isbn
     )
 
-    this.bookShelfJnRepository.addEntries([
-      ...currentShelves,
-      ...shelves.map((shelf) => ({
-        ...currentShelves.filter(
-          (currentShelf) => currentShelf.shelfCode === shelf.shelfCode
-        )['0'],
-        ...shelf,
-        bookIsbn: bookDto.isbn,
-      })),
+    const updatedShelfEntries = updatedShelves.map((updatedShelf) => ({
+      ...currentShelfEtries.find(
+        (currentShelfEntry) =>
+          currentShelfEntry.shelfCode === updatedShelf.shelfCode
+      ),
+      ...updatedShelf,
+      bookIsbn: bookDto.isbn,
+    }))
+
+    await this.bookShelfJnRepository.addEntries([
+      ...currentShelfEtries,
+      ...updatedShelfEntries,
     ])
 
     return updatedBook
   }
 
-  public removeBook = async (id: number): Promise<Book> => {
+  public removeBook = async (id: string): Promise<Book> => {
     const book = await this.bookRepository.findById(id, false)
     if (!book) throw new NotFoundException(`Book not found with id: ${id}`)
 
@@ -259,7 +262,7 @@ class BookService {
       employeeId: subscription.requestedBy,
       status: NotificationStatus.UNREAD,
       type: NotificationType.NOTIFY_ME,
-      content: `${book.title} is now available on ${shelfCode}`
+      content: `${book.title} is now available on ${shelfCode}`,
     }))
 
     const updatedSubscriptions = activeSubscriptions.map((subscription) => ({
@@ -285,8 +288,9 @@ class BookService {
 
     if (existingSubscriptions.length > 0) return existingSubscriptions[0]
 
-    const newSubscription =
-      await this.subscriptionRepository.addSubscription(subscriptionDto)
+    const newSubscription = await this.subscriptionRepository.addSubscription(
+      subscriptionDto
+    )
 
     if (subscriptionDto.requestedTo) {
       const { name } = await this.employeeRepository.findById(

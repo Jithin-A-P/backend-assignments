@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import NotificationService from '../service/notification.service'
-import BadRequestException from '../exception/bad-request.exception'
 import EditNotificationDto from '../dto/edit-notification.dto'
 import validator from '../middleware/validator.middleware'
 import autheticate from '../middleware/authenticate.middleware'
@@ -24,7 +23,7 @@ class NotificationController {
     next: NextFunction
   ) => {
     try {
-      const employeeId = Number(req.query.employeeId)
+      const employeeId = req.query.employeeId as string
       
       const notifications = await this.notificationService.getNotification(
         employeeId
@@ -44,9 +43,7 @@ class NotificationController {
     next: NextFunction
   ) => {
     try {
-      const notificationId = Number(req.params.id)
-      if (!Number.isInteger(notificationId))
-        throw new BadRequestException('Bad Request, invalid notification URL')
+      const notificationId = req.params.id
 
       const editedNotification =
         await this.notificationService.editNotification(

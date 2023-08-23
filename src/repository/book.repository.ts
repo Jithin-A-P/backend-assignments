@@ -12,7 +12,7 @@ class BookRepository {
     })
   }
 
-  public findById = (id: number, getShelfDetails: boolean): Promise<Book> => {
+  public findById = (id: string, getShelfDetails: boolean): Promise<Book> => {
     return this.bookRepository.findOne({
       relations: {
         bookShelfJns: {

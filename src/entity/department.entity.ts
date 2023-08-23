@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Employee from './employee.entity'
 
-@Entity('department')
+@Entity()
 class Department extends AbstractEntity {
   @Column()
   name: string

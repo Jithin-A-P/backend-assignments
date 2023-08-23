@@ -7,7 +7,7 @@ import NotificationType from '../utils/notification-type.enum'
 @Entity()
 class Notification extends AbstractEntity {
   @Column()
-  employeeId: number
+  employeeId: string
 
   @Column()
   status: NotificationStatus

@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne } from 'typeorm'
 import Employee from './employee.entity'
 import AbstractEntity from './absract.entity'
 
-@Entity('address') // PARAM: name of the table
+@Entity()
 class Address extends AbstractEntity {
   @Column()
   line1: string

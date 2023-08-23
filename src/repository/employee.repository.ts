@@ -11,7 +11,7 @@ class EmployeeRepository {
     })
   }
 
-  public findById = (id: number): Promise<Employee> => {
+  public findById = (id: string): Promise<Employee> => {
     return this.employeeRepository.findOne({
       where: { id: id },
       relations: {

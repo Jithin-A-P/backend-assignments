@@ -6,8 +6,8 @@ import {
 } from 'typeorm'
 
 class AbstractEntity {
-  @PrimaryGeneratedColumn()
-  id?: number
+  @PrimaryGeneratedColumn('uuid')
+  id?: string
 
   @CreateDateColumn()
   createdAt?: Date

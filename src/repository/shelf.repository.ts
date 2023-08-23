@@ -8,7 +8,7 @@ class ShelfRepository {
     return this.shelfRepository.find()
   }
 
-  public findById = (id: number): Promise<Shelf> => {
+  public findById = (id: string): Promise<Shelf> => {
     return this.shelfRepository.findOne({
       where: { id: id },
       relations: {
