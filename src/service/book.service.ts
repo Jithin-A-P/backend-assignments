@@ -7,6 +7,7 @@ import BorrowedBookRepository from '../repository/borrowed-book.repository'
 import BorrowBookDto from '../dto/borrow-book.dto'
 import BorrowedBook from '../entity/borrowed-book.entity'
 import BadRequestException from '../exception/bad-request.exception'
+import { ILike, IsNull, MoreThan } from 'typeorm'
 import SubscriptionDto from '../dto/subscription.dto'
 import Subscription from '../entity/subscription.entity'
 import SubscriptionRepository from '../repository/subscription.repository'
@@ -14,7 +15,6 @@ import Notification from '../entity/notification.entity'
 import EmployeeRepository from '../repository/employee.repository'
 import NotificationStatus from '../utils/notification-status.enum'
 import NotificationType from '../utils/notification-type.enum'
-import { ILike, MoreThan } from 'typeorm'
 import NotificationService from './notification.service'
 import SubscriptionStatus from '../utils/subscription.status.enum'
 
@@ -124,14 +124,16 @@ class BookService {
       updatedBook.isbn
     )
 
-    this.bookShelfJnRepository.addEntries(
-      shelves.map((shelf) => ({
+    this.bookShelfJnRepository.addEntries([
+      ...currentShelves,
+      ...shelves.map((shelf) => ({
         ...currentShelves.filter(
           (currentShelf) => currentShelf.shelfCode === shelf.shelfCode
         )['0'],
         ...shelf,
-      }))
-    )
+        bookIsbn: bookDto.isbn,
+      })),
+    ])
 
     return updatedBook
   }
@@ -168,6 +170,9 @@ class BookService {
       bookIsbn,
       shelfCode
     )
+
+    if (!bookShelfEntry)
+      throw new NotFoundException('Requested book no available')
 
     if (bookShelfEntry.bookCount === 0)
       throw new BadRequestException('Requested book not available on the shelf')
@@ -211,6 +216,7 @@ class BookService {
     const borrowedBook = await this.borrowedBookRepository.findBy({
       employeeId: employeeId,
       bookIsbn: bookIsbn,
+      returnedAt: IsNull(),
     })
 
     if (!borrowedBook)
@@ -226,10 +232,17 @@ class BookService {
         shelfReturnedTo: shelfCode,
       })
 
-    await this.bookShelfJnRepository.updateEntry({
-      ...bookShelfEntry,
-      bookCount: bookShelfEntry.bookCount + 1,
-    })
+    if (bookShelfEntry)
+      await this.bookShelfJnRepository.updateEntry({
+        ...bookShelfEntry,
+        bookCount: bookShelfEntry.bookCount + 1,
+      })
+    else
+      await this.bookShelfJnRepository.addEntry({
+        shelfCode: shelfCode,
+        bookIsbn: bookIsbn,
+        bookCount: 1,
+      })
 
     await this.bookRepository.updateBook({
       ...book,
