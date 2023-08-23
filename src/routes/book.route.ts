@@ -7,6 +7,12 @@ import BookShelfJnRepository from '../repository/book-shelf-jn.repository'
 import BookShelfJn from '../entity/book-shelf-jn.entity'
 import BorrowedBookRepository from '../repository/borrowed-book.repository'
 import BorrowedBook from '../entity/borrowed-book.entity'
+import NotificationRepository from '../repository/notification.repository'
+import Notification from '../entity/notification.entity'
+import SubscriptionRepository from '../repository/subscription.repository'
+import Subscription from '../entity/subscription.entity'
+import EmployeeRepository from '../repository/employee.repository'
+import Employee from '../entity/employee.entity'
 
 const bookRepository = new BookRepository(dataSource.getRepository(Book))
 const bookShelfJnRepository = new BookShelfJnRepository(
@@ -15,10 +21,22 @@ const bookShelfJnRepository = new BookShelfJnRepository(
 const borrowedBookRepository = new BorrowedBookRepository(
   dataSource.getRepository(BorrowedBook)
 )
+const notificationRepository = new NotificationRepository(
+  dataSource.getRepository(Notification)
+)
+const subscriptionRepository = new SubscriptionRepository(
+  dataSource.getRepository(Subscription)
+)
+const employeeRepository = new EmployeeRepository(
+  dataSource.getRepository(Employee)
+)
 const bookService = new BookService(
   bookRepository,
   bookShelfJnRepository,
-  borrowedBookRepository
+  borrowedBookRepository,
+  notificationRepository,
+  subscriptionRepository,
+  employeeRepository
 )
 const bookController = new BookController(bookService)
 const bookRoute = bookController.router

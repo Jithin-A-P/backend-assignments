@@ -3,6 +3,7 @@ import AbstractEntity from './absract.entity'
 import BookShelfJn from './book-shelf-jn.entity'
 import BorrowedBook from './borrowed-book.entity'
 import Notification from './notification.entity'
+import Subscription from './subscription.entity'
 
 @Entity()
 class Book extends AbstractEntity {
@@ -44,6 +45,9 @@ class Book extends AbstractEntity {
 
   @OneToMany(() => BorrowedBook, (borrowedBook) => borrowedBook.book)
   borrowedBooks?: BorrowedBook[]
+
+  @OneToMany(() => Subscription, (subscription) => subscription.subscribeTo)
+  subscriptions?: Subscription[]
 
   shelves?: any[]
 }
