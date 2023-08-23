@@ -6,7 +6,7 @@ import NotificationRepository from '../repository/notification.repository'
 class NotificationService {
   constructor(private notificationRepository: NotificationRepository) {}
 
-  public getNotification = async (id: number): Promise<Notification[]> => {
+  public getNotification = async (id: string): Promise<Notification[]> => {
     const notifications = await this.notificationRepository.findUnread(id)
     if (!notifications || notifications.length == 0) throw new NotFoundException('No notifications found')
 
@@ -26,7 +26,7 @@ class NotificationService {
   }
 
   public editNotification = async (
-    id: number,
+    id: string,
     editNotificationDto: EditNotificationDto
   ): Promise<Notification> => {
     const notification = await this.notificationRepository.findById(id)

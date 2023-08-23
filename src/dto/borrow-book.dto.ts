@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator'
 
 class BorrowBookDto {
   @IsNotEmpty()
-  @IsNumber()
-  employeeId: number
+  @IsUUID()
+  employeeId: string
 
   @IsNotEmpty()
   @IsString()

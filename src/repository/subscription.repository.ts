@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm'
 import Subscription from '../entity/subscription.entity'
-import SubscriptionStatus from '../utils/subscription.status.enum'
+import SubscriptionStatus from '../utils/subscription-status.enum'
 
 class SubscriptionRepository {
   constructor(private subscriptionRepository: Repository<Subscription>) {}
@@ -19,7 +19,7 @@ class SubscriptionRepository {
 
   public getActiveSubscriptions = (
     bookIsbn: string,
-    requestedBy: number
+    requestedBy: string
   ): Promise<Subscription[]> => {
     return this.subscriptionRepository.find({
       where: {

@@ -8,6 +8,7 @@ import {
   IsEnum,
   IsObject,
   ValidateNested,
+  IsUUID,
 } from 'class-validator'
 import { Type } from 'class-transformer'
 import Role from '../utils/role.enum'
@@ -48,8 +49,8 @@ class EditEmployeeDto {
 
   @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
-  @IsNumber()
-  departmentId: number
+  @IsUUID()
+  departmentId: string
 
   @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()

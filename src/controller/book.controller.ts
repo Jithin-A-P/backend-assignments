@@ -6,8 +6,9 @@ import BorrowBookDto from '../dto/borrow-book.dto'
 import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
-import BadRequestException from '../exception/bad-request.exception'
 import SubscriptionDto from '../dto/subscription.dto'
+import { isUUID } from 'class-validator'
+import BadRequestException from '../exception/bad-request.exception'
 
 class BookController {
   public router: Router
@@ -34,19 +35,19 @@ class BookController {
       validator(BorrowBookDto),
       this.returnBook
     ),
-    this.router.post(
-      '/:id/subscribe',
-      autheticate,
-      validator(SubscriptionDto),
-      this.addSubscription
-    ),
-    this.router.put(
-      '/:id',
-      autheticate,
-      authorize([Role.ADMIN]),
-      validator(BookDto),
-      this.updateBook
-    )
+      this.router.post(
+        '/:id/subscribe',
+        autheticate,
+        validator(SubscriptionDto),
+        this.addSubscription
+      ),
+      this.router.put(
+        '/:id',
+        autheticate,
+        authorize([Role.ADMIN]),
+        validator(BookDto),
+        this.updateBook
+      )
     this.router.delete(
       '/:id',
       autheticate,
@@ -64,18 +65,18 @@ class BookController {
       const rowsPerPage = Number(req.query.rowsPerPage)
       const pageNumber = Number(req.query.pageNumber)
 
-      const searchQuery = req.query.searchQuery
-      const category = req.query.category
-      const available = req.query.available
+      const searchQuery = req.query.searchQuery as string
+      const category = req.query.category as string
+      const available = req.query.available as string
 
       const books = await this.bookService.getAllBooks(
         rowsPerPage,
         pageNumber,
-        searchQuery as string,
-        category as string,
-        available as string
+        searchQuery,
+        category,
+        available
       )
-      
+
       res.locals.total = books.pop()
       res.locals.data = books.pop()
       res.status(200)
@@ -91,9 +92,8 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id)
-      if (!Number.isInteger(bookId))
-        throw new BadRequestException('Bad Request, invalid book URL')
+      const bookId = req.params.id
+      if (!isUUID(bookId)) throw new BadRequestException('Invalid book id')
 
       const book = await this.bookService.getBookById(bookId)
       res.status(200)
@@ -116,7 +116,11 @@ class BookController {
     }
   }
 
-  private addSubscription = async (req: Request, res: Response, next: NextFunction) => {
+  private addSubscription = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const newSubscription = await this.bookService.addSubscription(req.body)
       res.status(201)
@@ -169,9 +173,8 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id)
-      if (!Number.isInteger(bookId))
-        throw new BadRequestException('Bad Request, invalid book URL')
+      const bookId = req.params.id
+      if (!isUUID(bookId)) throw new BadRequestException('Invalid book id')
 
       const updatedBook = await this.bookService.updateBook(bookId, req.body)
       res.status(200)
@@ -188,9 +191,8 @@ class BookController {
     next: NextFunction
   ) => {
     try {
-      const bookId = Number(req.params.id)
-      if (!Number.isInteger(bookId))
-        throw new BadRequestException('Bad Request, invalid book URL')
+      const bookId = req.params.id
+      if (!isUUID(bookId)) throw new BadRequestException('Invalid book id')
 
       const editedBook = await this.bookService.removeBook(bookId)
       res.status(204)

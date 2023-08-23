@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsObject,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
@@ -43,8 +44,8 @@ class EmployeeDto {
   status: Status
 
   @IsNotEmpty()
-  @IsNumber()
-  departmentId: number
+  @IsUUID()
+  departmentId: string
 
   @IsNotEmpty()
   @IsObject()

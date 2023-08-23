@@ -3,8 +3,8 @@ import ShelfService from '../service/shelf.service'
 import ShelfDto from '../dto/shelf.dto'
 import validator from '../middleware/validator.middleware'
 import EditShelfDto from '../dto/edit-shelf.dto'
+import { isUUID } from 'class-validator'
 import BadRequestException from '../exception/bad-request.exception'
-
 
 class ShelfController {
   public router: Router
@@ -39,9 +39,8 @@ class ShelfController {
     next: NextFunction
   ) => {
     try {
-      const shelfId = Number(req.params.id)
-      if (!Number.isInteger(shelfId))
-        throw new BadRequestException('Bad Request, invalid shelf URL')
+      const shelfId = req.params.id
+      if (!isUUID(shelfId)) throw new BadRequestException('Invalid shelf id')
 
       const shelf = await this.shelfService.getShelfById(shelfId)
       res.status(200)
@@ -74,9 +73,9 @@ class ShelfController {
     next: NextFunction
   ) => {
     try {
-      const shelfId = Number(req.params.id)
-      if (!Number.isInteger(shelfId))
-        throw new BadRequestException('Bad Request, invalid shelf URL')
+      const shelfId = req.params.id
+      if (!isUUID(shelfId)) throw new BadRequestException('Invalid shelf id')
+
       const editedShelf = await this.shelfService.editShelf(shelfId, req.body)
       res.status(200)
       res.locals.data = editedShelf
@@ -92,9 +91,9 @@ class ShelfController {
     next: NextFunction
   ) => {
     try {
-      const shelfId = Number(req.params.id)
-      if (!Number.isInteger(shelfId))
-        throw new BadRequestException('Bad Request, invalid shelf URL')
+      const shelfId = req.params.id
+      if (!isUUID(shelfId)) throw new BadRequestException('Invalid shelf id')
+
       const updatedShelf = await this.shelfService.updateShelf(
         shelfId,
         req.body
@@ -113,9 +112,9 @@ class ShelfController {
     next: NextFunction
   ) => {
     try {
-      const shelfId = Number(req.params.id)
-      if (!Number.isInteger(shelfId))
-        throw new BadRequestException('Bad Request, invalid shelf URL')
+      const shelfId = req.params.id
+      if (!isUUID(shelfId)) throw new BadRequestException('Invalid shelf id')
+
       const editedShelf = await this.shelfService.removeShelf(shelfId)
       res.status(204)
       res.locals.data = editedShelf

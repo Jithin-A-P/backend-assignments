@@ -1,15 +1,15 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateIf } from "class-validator";
-import SubscriptionStatus from "../utils/subscription.status.enum";
+import { IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, ValidateIf } from "class-validator";
+import SubscriptionStatus from "../utils/subscription-status.enum";
 
 class SubscriptionDto {
   @IsNotEmpty()
-  @IsNumber()
-  requestedBy: number;
+  @IsUUID()
+  requestedBy: string;
 
   @ValidateIf((obj) => obj.value !== undefined)
   @IsNotEmpty()
-  @IsNumber()
-  requestedTo?: number;
+  @IsUUID()
+  requestedTo?: string;
 
   @IsNotEmpty()
   @IsString()

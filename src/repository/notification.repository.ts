@@ -9,7 +9,7 @@ class NotificationRepository {
       return this.notificationRepository.find()
     }
 
-    public findById = (id: number): Promise<Notification> => {
+    public findById = (id: string): Promise<Notification> => {
         return this.notificationRepository.findOne({
             where: {id : id},
         })

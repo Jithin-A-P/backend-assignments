@@ -2,15 +2,15 @@ import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Employee from './employee.entity'
 import Book from './book.entity'
-import SubscriptionStatus from '../utils/subscription.status.enum'
+import SubscriptionStatus from '../utils/subscription-status.enum'
 
 @Entity()
 class Subscription extends AbstractEntity {
   @Column()
-  requestedBy: number
+  requestedBy: string
 
   @Column({ nullable: true })
-  requestedTo?: number
+  requestedTo?: string
 
   @Column()
   bookISBN: string

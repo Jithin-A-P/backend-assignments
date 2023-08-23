@@ -24,7 +24,7 @@ class EmployeeService {
     return this.employeeRepository.findAll(skip, take)
   }
 
-  public getEmployeeById = async (id: number): Promise<Employee> => {
+  public getEmployeeById = async (id: string): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
     if (!employee)
       throw new NotFoundException(`Employee not found with id: ${id}`)
@@ -38,7 +38,7 @@ class EmployeeService {
   }
 
   public editEmployee = async (
-    id: number,
+    id: string,
     editEmployeeDto: EditEmployeeDto
   ): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
@@ -62,7 +62,7 @@ class EmployeeService {
     return editedEmployee
   }
 
-  public removeEmployeeById = async (id: number): Promise<Employee> => {
+  public removeEmployeeById = async (id: string): Promise<Employee> => {
     const employee = await this.employeeRepository.findById(id)
     return this.employeeRepository.remove(employee)
   }
@@ -79,7 +79,7 @@ class EmployeeService {
   }
 
   public updateEmployee = async (
-    id: number,
+    id: string,
     employeeDto: EmployeeDto
   ): Promise<Employee> => {
     const employee = await this.getEmployeeById(id)

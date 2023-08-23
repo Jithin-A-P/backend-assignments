@@ -8,13 +8,13 @@ class DepartmentRepository {
     return this.departmentRepositroy.find()
   }
 
-  public findById = (id: number): Promise<Department> => {
+  public findById = (id: string): Promise<Department> => {
     return this.departmentRepositroy.findOne({
       where: { id: id },
     })
   }
 
-  public findByIdWithEmployees = (id: number): Promise<Department> => {
+  public findByIdWithEmployees = (id: string): Promise<Department> => {
     return this.departmentRepositroy.findOne({
       where: { id: id },
       relations: {

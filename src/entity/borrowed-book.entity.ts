@@ -7,7 +7,7 @@ import Book from './book.entity'
 @Entity()
 class BorrowedBook extends AbstractEntity {
   @Column()
-  employeeId: number
+  employeeId: string
 
   @Column()
   bookIsbn: string

@@ -13,7 +13,7 @@ class ShelfService {
     return this.shelfRepository.findAll()
   }
 
-  public getShelfById = async (id: number): Promise<Shelf> => {
+  public getShelfById = async (id: string): Promise<Shelf> => {
     const shelf = await this.shelfRepository.findById(id)
     if (!shelf) throw new NotFoundException(`Shelf not found with id: ${id}`)
 
@@ -32,7 +32,7 @@ class ShelfService {
     return newShelf
   }
 
-  public removeShelf = async (id: number): Promise<Shelf> => {
+  public removeShelf = async (id: string): Promise<Shelf> => {
     const shelf = await this.shelfRepository.findById(id)
     if (!shelf) throw new NotFoundException(`Shelf not found with id: ${id}`)
 
@@ -43,7 +43,7 @@ class ShelfService {
   }
 
   public editShelf = async (
-    id: number,
+    id: string,
     editShelfDto: EditShelfDto
   ): Promise<Shelf> => {
     const shelf = await this.shelfRepository.findById(id)
@@ -59,7 +59,7 @@ class ShelfService {
     return editedShelf
   }
 
-  public updateShelf = async (id: number, shelfDto: Shelf): Promise<Shelf> => {
+  public updateShelf = async (id: string, shelfDto: Shelf): Promise<Shelf> => {
     const shelf = await this.shelfRepository.findById(id)
     if (!shelf) throw new NotFoundException(`Shelf not found with id: ${id}`)
 

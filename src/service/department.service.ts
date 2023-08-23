@@ -18,7 +18,7 @@ class DepartmentService {
     return this.departmentRepository.add(departmentDto as Department)
   }
 
-  public getDepartmentById = async (id: number): Promise<Department> => {
+  public getDepartmentById = async (id: string): Promise<Department> => {
     const department = await this.departmentRepository.findById(id)
     if (!department)
       throw new NotFoundException(`Department not found with id: ${id}`)
@@ -26,7 +26,7 @@ class DepartmentService {
   }
 
   public editDepartment = async (
-    id: number,
+    id: string,
     editDepartmentDto: EditDepartmentDto
   ): Promise<Department> => {
     const department = await this.departmentRepository.findById(id)
@@ -45,7 +45,7 @@ class DepartmentService {
     return editedDepartment
   }
 
-  public removeDepartmentById = async (id: number): Promise<Department> => {
+  public removeDepartmentById = async (id: string): Promise<Department> => {
     const department = await this.departmentRepository.findByIdWithEmployees(id)
 
     if (!department)
@@ -58,7 +58,7 @@ class DepartmentService {
   }
 
   public updateDepartment = async (
-    id: number,
+    id: string,
     departmentDto: Department
   ): Promise<Department> => {
     const department = await this.departmentRepository.findById(id)
