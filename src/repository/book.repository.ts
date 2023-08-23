@@ -16,12 +16,15 @@ class BookRepository {
     })
   }
 
-  public findById = (id: string, getShelfDetails: boolean): Promise<Book> => {
+  public findById = (id: string, getRelations: boolean): Promise<Book> => {
     return this.bookRepository.findOne({
       relations: {
-        bookShelfJns: {
-          shelf: getShelfDetails,
+        bookShelfJns: getRelations && {
+          shelf: getRelations,
         },
+        borrowedBooks: getRelations && {
+          employee: getRelations,
+        }
       },
       where: { id: id },
     })

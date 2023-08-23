@@ -68,10 +68,15 @@ class BookService {
     const { bookShelfJns } = book
     delete book['bookShelfJns']
 
+    const { borrowedBooks } = book
+    delete book['borrowedBooks']
+
     book.shelves = bookShelfJns.map((bookShelfJn) => ({
       ...bookShelfJn.shelf,
       availableBookCount: bookShelfJn.bookCount,
     }))
+
+    book.borrowedBy = borrowedBooks.map((borrowedBook) => borrowedBook.employee)
 
     return book
   }
