@@ -30,7 +30,7 @@ class BookRepository {
     return this.bookRepository.findOne({
       where: { isbn: isbn },
       relations: {
-        bookShelfJns: {
+        bookShelfJns: getShlefDetails && {
           shelf: getShlefDetails,
         }
       },

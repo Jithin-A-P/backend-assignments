@@ -21,6 +21,10 @@ class BookShelfJnRepository {
     });
   };
 
+  public addEntry = (bookShelfJnEntrie: BookShelfJn): Promise<BookShelfJn> => {
+    return this.bookShelfRepository.save(bookShelfJnEntrie);
+  };
+
   public addEntries = (bookShelfJnEntries: BookShelfJn[]): Promise<BookShelfJn[]> => {
     return this.bookShelfRepository.save(bookShelfJnEntries);
   };
