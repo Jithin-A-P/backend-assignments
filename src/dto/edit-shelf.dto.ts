@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsSemVer, IsString, ValidateIf } from 'class-validator'
+import { IsNotEmpty, IsString, ValidateIf } from 'class-validator'
 
 class EditShelfDto {
   @ValidateIf((obj) => obj.value !== undefined)

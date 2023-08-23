@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import AbstractEntity from './absract.entity'
-import Book from './book.entity'
 import Employee from './employee.entity'
+import NotificationStatus from '../utils/notification-status.enum'
+import NotificationType from '../utils/notification-type.enum'
 
 @Entity()
 class Notification extends AbstractEntity {
@@ -9,23 +10,13 @@ class Notification extends AbstractEntity {
   employeeId: number
 
   @Column()
-  bookIsbn: string
+  status: NotificationStatus
 
   @Column()
-  status: string
-
-  @Column()
-  type: string
+  type: NotificationType
 
   @Column()
   content: string
-
-  @ManyToOne(() => Book, (book) => book.notifications)
-  @JoinColumn({
-    name: 'book_isbn',
-    referencedColumnName: 'isbn'
-  })
-  book?: Book
 
   @ManyToOne(() => Employee, (employee) => employee.notifications)
   @JoinColumn({
@@ -33,7 +24,6 @@ class Notification extends AbstractEntity {
     referencedColumnName: 'id'
   })
   employee?: Employee
-
 }
 
 export default Notification;
