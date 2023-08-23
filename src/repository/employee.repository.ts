@@ -16,6 +16,9 @@ class EmployeeRepository {
       where: { id: id },
       relations: {
         address: true,
+        borrowedBooks: {
+          book: true
+        },
       },
     })
   }

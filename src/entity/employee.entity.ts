@@ -15,6 +15,7 @@ import Department from './department.entity'
 import Status from '../utils/status.enum'
 import Notification from './notification.entity'
 import BorrowedBook from './borrowed-book.entity'
+import Book from './book.entity'
 import Subscription from './subscription.entity'
 
 @Entity('employee')
@@ -54,7 +55,7 @@ class Employee extends AbstractEntity {
   notifications?: Notification[]
 
   @OneToMany(() => BorrowedBook, (borrowedBook) => borrowedBook.employee)
-  borrowedBooks?: BorrowedBook[]
+  borrowedBooks?: BorrowedBook[] | Book[]
 
   @OneToMany(() => Subscription, (subscription) => subscription.requestFrom)
   requestByUser?: Subscription[]
