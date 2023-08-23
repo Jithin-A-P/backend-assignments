@@ -28,6 +28,12 @@ class EmployeeService {
     const employee = await this.employeeRepository.findById(id)
     if (!employee)
       throw new NotFoundException(`Employee not found with id: ${id}`)
+
+    employee.borrowedBooks = employee.borrowedBooks.map((borrowedBook) => {
+      if (!borrowedBook.returnedAt)
+        return borrowedBook.book
+    }) 
+    
     return employee
   }
 
