@@ -8,12 +8,24 @@ import BorrowBookDto from '../dto/borrow-book.dto'
 import BorrowedBook from '../entity/borrowed-book.entity'
 import BadRequestException from '../exception/bad-request.exception'
 import { ILike, IsNull, MoreThan } from 'typeorm'
+import SubscriptionDto from '../dto/subscription.dto'
+import Subscription from '../entity/subscription.entity'
+import SubscriptionRepository from '../repository/subscription.repository'
+import Notification from '../entity/notification.entity'
+import EmployeeRepository from '../repository/employee.repository'
+import NotificationStatus from '../utils/notification-status.enum'
+import NotificationType from '../utils/notification-type.enum'
+import NotificationService from './notification.service'
+import SubscriptionStatus from '../utils/subscription.status.enum'
 
 class BookService {
   constructor(
     private bookRepository: BookRepository,
     private bookShelfJnRepository: BookShelfJnRepository,
-    private borrowedBookRepository: BorrowedBookRepository
+    private borrowedBookRepository: BorrowedBookRepository,
+    private subscriptionRepository: SubscriptionRepository,
+    private employeeRepository: EmployeeRepository,
+    private notificationService: NotificationService
   ) {}
 
   public getAllBooks = (
@@ -232,16 +244,70 @@ class BookService {
         bookCount: 1,
       })
 
-    console.log({
-      ...book,
-      availableCount: book.availableCount + 1,
-    })
     await this.bookRepository.updateBook({
       ...book,
       availableCount: book.availableCount + 1,
     })
 
+    const activeSubscriptions =
+      await this.subscriptionRepository.getActiveSubscriptions(
+        bookIsbn,
+        employeeId
+      )
+
+    const newNotifications = activeSubscriptions.map((subscription) => ({
+      employeeId: subscription.requestedBy,
+      status: NotificationStatus.UNREAD,
+      type: NotificationType.NOTIFY_ME,
+      content: `${book.title} is now available on ${shelfCode}`
+    }))
+
+    const updatedSubscriptions = activeSubscriptions.map((subscription) => ({
+      ...subscription,
+      status: SubscriptionStatus.INACTIVE,
+    }))
+
+    await this.subscriptionRepository.updateSubscriptions(updatedSubscriptions)
+
+    await this.notificationService.addNotifications(newNotifications)
+
     return updatedBorrowedBook
+  }
+
+  public addSubscription = async (
+    subscriptionDto: SubscriptionDto
+  ): Promise<Subscription> => {
+    const existingSubscriptions =
+      await this.subscriptionRepository.getActiveSubscriptions(
+        subscriptionDto.bookISBN,
+        subscriptionDto.requestedBy
+      )
+
+    if (existingSubscriptions.length > 0) return existingSubscriptions[0]
+
+    const newSubscription =
+      await this.subscriptionRepository.addSubscription(subscriptionDto)
+
+    if (subscriptionDto.requestedTo) {
+      const { name } = await this.employeeRepository.findById(
+        subscriptionDto.requestedBy
+      )
+
+      const { title } = await this.bookRepository.findByISBN(
+        subscriptionDto.bookISBN,
+        false
+      )
+
+      const newNotification = new Notification()
+      newNotification.content = `${name} has requested for ${title}.`
+      newNotification.employeeId = subscriptionDto.requestedTo
+      newNotification.status = NotificationStatus.UNREAD
+      newNotification.type = NotificationType.REQUEST
+
+      await this.notificationService.addNotification(newNotification)
+    }
+
+    return newSubscription
   }
 }
 
