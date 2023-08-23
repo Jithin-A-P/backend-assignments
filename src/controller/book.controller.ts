@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response, Router } from 'express'
+import { isUUID } from 'class-validator'
 import BookService from '../service/book.service'
 import BookDto from '../dto/book.dto'
-import validator from '../middleware/validator.middleware'
+import validateBody from '../middleware/validate-body.middleware'
 import BorrowBookDto from '../dto/borrow-book.dto'
 import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import SubscriptionDto from '../dto/subscription.dto'
-import { isUUID } from 'class-validator'
 import BadRequestException from '../exception/bad-request.exception'
 
 class BookController {
@@ -20,34 +20,34 @@ class BookController {
       '/',
       autheticate,
       authorize([Role.ADMIN]),
-      validator(BookDto),
+      validateBody(BookDto),
       this.addBook
     )
     this.router.post(
       '/:isbn/lend',
       autheticate,
-      validator(BorrowBookDto),
+      validateBody(BorrowBookDto),
       this.borrowBook
     )
     this.router.post(
       '/:isbn/return',
       autheticate,
-      validator(BorrowBookDto),
+      validateBody(BorrowBookDto),
       this.returnBook
     ),
-      this.router.post(
-        '/:id/subscribe',
-        autheticate,
-        validator(SubscriptionDto),
-        this.addSubscription
-      ),
-      this.router.put(
-        '/:id',
-        autheticate,
-        authorize([Role.ADMIN]),
-        validator(BookDto),
-        this.updateBook
-      )
+    this.router.post(
+      '/:id/subscribe',
+      autheticate,
+      validateBody(SubscriptionDto),
+      this.addSubscription
+    ),
+    this.router.put(
+      '/:id',
+      autheticate,
+      authorize([Role.ADMIN]),
+      validateBody(BookDto),
+      this.updateBook
+    )
     this.router.delete(
       '/:id',
       autheticate,

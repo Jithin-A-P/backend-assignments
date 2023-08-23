@@ -1,13 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express'
+import { isUUID } from 'class-validator'
 import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import DepartmentService from '../service/department.service'
 import DepartmentDto from '../dto/department.dto'
-import validator from '../middleware/validator.middleware'
+import validateBody from '../middleware/validate-body.middleware'
 import EditDepartmentDto from '../dto/edit-department.dto'
 import BadRequestException from '../exception/bad-request.exception'
-import { isUUID } from 'class-validator'
 
 class DepartmentController {
   public router: Router
@@ -18,7 +18,7 @@ class DepartmentController {
       '/',
       autheticate,
       authorize([Role.ADMIN, Role.HR]),
-      validator(DepartmentDto),
+      validateBody(DepartmentDto),
       this.addDepartment
     )
     this.router.get('/:id', autheticate, this.getDepartmentById)
@@ -26,14 +26,14 @@ class DepartmentController {
       '/:id',
       autheticate,
       authorize([Role.ADMIN, Role.HR]),
-      validator(DepartmentDto),
+      validateBody(DepartmentDto),
       this.updateDepartmentById
     )
     this.router.patch(
       '/:id',
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
-      validator(EditDepartmentDto),
+      validateBody(EditDepartmentDto),
       this.editDepartmentById
     )
     this.router.delete(

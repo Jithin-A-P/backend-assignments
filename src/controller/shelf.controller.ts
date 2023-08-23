@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import ShelfService from '../service/shelf.service'
 import ShelfDto from '../dto/shelf.dto'
-import validator from '../middleware/validator.middleware'
+import validateBody from '../middleware/validate-body.middleware'
 import EditShelfDto from '../dto/edit-shelf.dto'
 import { isUUID } from 'class-validator'
 import BadRequestException from '../exception/bad-request.exception'
@@ -12,9 +12,9 @@ class ShelfController {
     this.router = Router()
     this.router.get('/', this.getAllShelves)
     this.router.get('/:id', this.getShelfById)
-    this.router.post('/', validator(ShelfDto), this.addShelf)
-    this.router.put('/:id', validator(ShelfDto), this.updateShelfById)
-    this.router.patch('/:id', validator(EditShelfDto), this.editShelfById)
+    this.router.post('/', validateBody(ShelfDto), this.addShelf)
+    this.router.put('/:id', validateBody(ShelfDto), this.updateShelfById)
+    this.router.patch('/:id', validateBody(EditShelfDto), this.editShelfById)
     this.router.delete('/:id', this.removeShelfById)
   }
 

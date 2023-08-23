@@ -3,7 +3,7 @@ import EmployeeService from '../service/employee.service'
 import EmployeeDto from '../dto/employee.dto'
 import autheticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
-import validator from '../middleware/validator.middleware'
+import validateBody from '../middleware/validate-body.middleware'
 import Role from '../utils/role.enum'
 import LoginDto from '../dto/login.dto'
 import EditEmployeeDto from '../dto/edit-employee.dto'
@@ -19,7 +19,7 @@ class EmployeeController {
       '/',
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
-      validator(EmployeeDto),
+      validateBody(EmployeeDto),
       this.addEmployee
     )
     this.router.get('/:id', autheticate, this.getEmployeeById)
@@ -27,14 +27,14 @@ class EmployeeController {
       '/:id',
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
-      validator(EmployeeDto),
+      validateBody(EmployeeDto),
       this.updateEmployeeById
     )
     this.router.patch(
       '/:id',
       autheticate,
       authorize([Role.HR, Role.ADMIN]),
-      validator(EditEmployeeDto),
+      validateBody(EditEmployeeDto),
       this.editEmployeeById
     )
     this.router.delete(
@@ -43,7 +43,7 @@ class EmployeeController {
       authorize([Role.HR, Role.ADMIN]),
       this.removeEmployeeById
     )
-    this.router.post('/login', validator(LoginDto), this.loginEmployee)
+    this.router.post('/login', validateBody(LoginDto), this.loginEmployee)
   }
 
   private addEmployee = async (

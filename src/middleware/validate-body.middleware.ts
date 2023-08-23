@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
-import RequestWithUser from '../utils/request-with-user.interface'
 import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import ValidationException from '../exception/validation.exception'
+import RequestWithUser from '../utils/request-with-user.interface'
 
-const validator = (DtoClass) => {
+const validateBody = (DtoClass) => {
   return async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const dto = plainToInstance(DtoClass, req.body)
@@ -19,4 +19,4 @@ const validator = (DtoClass) => {
   }
 }
 
-export default validator
+export default validateBody
