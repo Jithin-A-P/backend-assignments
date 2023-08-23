@@ -3,6 +3,8 @@ import NotificationService from '../service/notification.service'
 import EditNotificationDto from '../dto/edit-notification.dto'
 import validator from '../middleware/validator.middleware'
 import autheticate from '../middleware/authenticate.middleware'
+import BadRequestException from '../exception/bad-request.exception'
+import { isUUID } from 'class-validator'
 
 class NotificationController {
   public router: Router
@@ -24,7 +26,7 @@ class NotificationController {
   ) => {
     try {
       const employeeId = req.query.employeeId as string
-      
+
       const notifications = await this.notificationService.getNotification(
         employeeId
       )
@@ -44,6 +46,8 @@ class NotificationController {
   ) => {
     try {
       const notificationId = req.params.id
+      if (!isUUID(notificationId))
+        throw new BadRequestException('Invalid notification id')
 
       const editedNotification =
         await this.notificationService.editNotification(

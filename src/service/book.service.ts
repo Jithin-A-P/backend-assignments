@@ -120,12 +120,12 @@ class BookService {
       availableCount: availableCount,
     })
 
-    const currentShelfEtries = await this.bookShelfJnRepository.getAllEntries(
+    const currentShelfEntries = await this.bookShelfJnRepository.getAllEntries(
       updatedBook.isbn
     )
 
     const updatedShelfEntries = updatedShelves.map((updatedShelf) => ({
-      ...currentShelfEtries.find(
+      ...currentShelfEntries.find(
         (currentShelfEntry) =>
           currentShelfEntry.shelfCode === updatedShelf.shelfCode
       ),
@@ -134,7 +134,7 @@ class BookService {
     }))
 
     await this.bookShelfJnRepository.addEntries([
-      ...currentShelfEtries,
+      ...currentShelfEntries,
       ...updatedShelfEntries,
     ])
 

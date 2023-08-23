@@ -7,6 +7,8 @@ import validator from '../middleware/validator.middleware'
 import Role from '../utils/role.enum'
 import LoginDto from '../dto/login.dto'
 import EditEmployeeDto from '../dto/edit-employee.dto'
+import { isUUID } from 'class-validator'
+import BadRequestException from '../exception/bad-request.exception'
 
 class EmployeeController {
   public router: Router
@@ -90,6 +92,9 @@ class EmployeeController {
   ) => {
     try {
       const employeeId = req.params.id
+      if (!isUUID(employeeId))
+        throw new BadRequestException('Invalid employee id')
+
       const employee = await this.employeeService.getEmployeeById(employeeId)
       res.status(200)
       res.locals.data = employee
@@ -106,6 +111,8 @@ class EmployeeController {
   ) => {
     try {
       const employeeId = req.params.id
+      if (!isUUID(employeeId))
+        throw new BadRequestException('Invalid employee id')
 
       const employee = await this.employeeService.editEmployee(
         employeeId,
@@ -127,6 +134,8 @@ class EmployeeController {
   ) => {
     try {
       const employeeId = req.params.id
+      if (!isUUID(employeeId))
+        throw new BadRequestException('Invalid employee id')
 
       const updatedEmployee = await this.employeeService.updateEmployee(
         employeeId,
@@ -148,6 +157,8 @@ class EmployeeController {
   ) => {
     try {
       const employeeId = req.params.id
+      if (!isUUID(employeeId))
+        throw new BadRequestException('Invalid employee id')
 
       await this.employeeService.removeEmployeeById(employeeId)
 
