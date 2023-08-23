@@ -4,6 +4,7 @@ dotenv.config({ path: __dirname + '/.env' })
 import express from 'express'
 import cors from 'cors'
 import 'reflect-metadata'
+import fileUpload from 'express-fileupload'
 import loggerMiddleware from './middleware/logger.middleware'
 import dataSource from './db/postgres.db'
 import employeeRoute from './routes/employee.route'
@@ -21,6 +22,7 @@ const PORT = process.env.PORT
 
 server.use(cors())
 server.use(express.json())
+server.use(fileUpload())
 server.use(loggerMiddleware)
 server.use('/api/employees', employeeRoute)
 server.use('/api/departments', departmentRoute)

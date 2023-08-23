@@ -4,11 +4,15 @@ import Book from '../entity/book.entity'
 class BookRepository {
   constructor(private bookRepository: Repository<Book>) {}
 
-  public findAll = (skip: number, take: number, filter: any): Promise<[Book[], number]> => {
+  public findAll = (
+    skip: number,
+    take: number,
+    filter: any
+  ): Promise<[Book[], number]> => {
     return this.bookRepository.findAndCount({
       skip: skip,
       take: take,
-      where: filter
+      where: filter,
     })
   }
 
@@ -17,7 +21,7 @@ class BookRepository {
       relations: {
         bookShelfJns: {
           shelf: getShelfDetails,
-        }
+        },
       },
       where: { id: id },
     })
@@ -32,13 +36,17 @@ class BookRepository {
       relations: {
         bookShelfJns: getShlefDetails && {
           shelf: getShlefDetails,
-        }
+        },
       },
     })
   }
 
   public addBook = (book: Book): Promise<Book> => {
     return this.bookRepository.save(book)
+  }
+
+  public addBooks = (books: Book[]): Promise<Book[]> => {
+    return this.bookRepository.save(books)
   }
 
   public updateBook = (book: Book): Promise<Book> => {

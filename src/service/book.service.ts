@@ -1,4 +1,8 @@
+import xlsx from 'xlsx'
 import { ILike, IsNull, MoreThan } from 'typeorm'
+import { plainToInstance } from 'class-transformer'
+import { UploadedFile } from 'express-fileupload'
+import { validate } from 'class-validator'
 import NotFoundException from '../exception/not-found.exception'
 import BookDto from '../dto/book.dto'
 import BookRepository from '../repository/book.repository'
@@ -17,6 +21,7 @@ import NotificationStatus from '../utils/notification-status.enum'
 import NotificationType from '../utils/notification-type.enum'
 import NotificationService from './notification.service'
 import SubscriptionStatus from '../utils/subscription-status.enum'
+import ValidationException from '../exception/validation.exception'
 
 class BookService {
   constructor(
@@ -94,6 +99,71 @@ class BookService {
     )
 
     return addedBook
+  }
+
+  public bulkAddBook = async (file: UploadedFile): Promise<Book[]> => {
+    const data = xlsx.read(file.data)
+    const sheet = data.Sheets[data.SheetNames[0]]
+    const booksData = xlsx.utils.sheet_to_json(sheet, {
+      defval: null,
+    })
+
+    const bookShelfJnEntries = []
+    const bookEntries = []
+
+    await Promise.all(
+      booksData.map(async (bookData) => {
+        const {
+          Title: title,
+          Author: author,
+          ISBN: isbn,
+          Category: category,
+          Description: description,
+          Publisher: publisher,
+          'Release Date': releaseDate,
+          ...shelvesData
+        } = bookData as any
+
+        const bookShelfJnEntry = Object.keys(shelvesData).map((shelfCode) => ({
+          shelfCode: shelfCode,
+          bookCount: shelvesData[shelfCode] || 0,
+          bookIsbn: isbn,
+        }))
+
+        const totalCount = bookShelfJnEntry.reduce(
+          (total, shelf) => total + shelf.bookCount,
+          0
+        )
+
+        const bookEntry = {
+          title: title,
+          author: author,
+          isbn: isbn,
+          category: category,
+          description: description,
+          publisher: publisher,
+          releaseDate: releaseDate,
+          totalCount: totalCount,
+          availableCount: totalCount
+        }
+
+        const bookDto = plainToInstance(BookDto, {
+          ...bookEntry,
+          shelves: bookShelfJnEntry,
+        })
+
+        const errors = await validate(bookDto)
+        if (errors.length > 0) throw new ValidationException(errors)
+
+        bookEntries.push(bookEntry)
+        bookShelfJnEntries.push(...bookShelfJnEntry)
+      })
+    )
+
+    const addedBooks = await this.bookRepository.addBooks(bookEntries)
+    await this.bookShelfJnRepository.addEntries(bookShelfJnEntries)
+
+    return addedBooks
   }
 
   public updateBook = async (id: string, bookDto: BookDto): Promise<Book> => {
