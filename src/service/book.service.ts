@@ -130,8 +130,6 @@ class BookService {
           bookIsbn: isbn,
         }))
 
-        console.log(bookShelfJnEntry)
-
         const totalCount = bookShelfJnEntry.reduce(
           (total, shelf) => total + shelf.bookCount,
           0
