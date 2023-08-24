@@ -33,7 +33,7 @@ const validateQuery = (
     }
 
     if (req.query.category) {
-      if (!isEnum(BookCategory, category))
+      if (!isEnum(category, BookCategory))
         throw new BadRequestException("Invalid query parameter: category");
     }
 
@@ -49,7 +49,6 @@ const validateQuery = (
 
     next();
   } catch (error) {
-    console.log("Inside catch");
     next(error);
   }
 };

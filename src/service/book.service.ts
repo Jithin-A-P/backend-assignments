@@ -52,7 +52,7 @@ class BookService {
 
     if (category) filters['category'] = ILike(`%${category}%`)
 
-    if (available) filters['availableCount'] = MoreThan(0)
+    if (available == 'true') filters['availableCount'] = MoreThan(0)
 
     const searchFilter = [
       { ...filters, isbn: ILike(`%${searchQuery || '%'}%`) },
