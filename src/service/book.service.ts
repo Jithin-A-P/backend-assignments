@@ -85,20 +85,49 @@ class BookService {
       0
     )
 
-    const addedBook = await this.bookRepository.addBook({
-      ...(bookDto as any),
-      totalCount: totalCount,
-      availableCount: totalCount,
-    })
+    let addedBook = null
+    try {
+      addedBook = await this.bookRepository.addBook({
+        ...(bookDto as any),
+        totalCount: totalCount,
+        availableCount: totalCount,
+      })
 
-    await this.bookShelfJnRepository.addEntries(
-      shelves.map((shelf) => ({
-        ...shelf,
-        bookIsbn: bookDto.isbn,
-      }))
-    )
+      await this.bookShelfJnRepository.addEntries(
+        shelves.map((shelf) => ({
+          ...shelf,
+          bookIsbn: bookDto.isbn,
+        }))
+      )
 
-    return addedBook
+      return addedBook
+    } catch (error) {
+      const isbnAlreadyExists = /(isbn)[\s\S]+(already exists)/.test(
+        error.detail
+      )
+
+      if (isbnAlreadyExists)
+        throw new BadRequestException(
+          `Book with ISBN ${bookDto.isbn} already exists`
+        )
+
+      const shelfDoesNotExists =
+        /(shelf_code)[\s\S]+(is not present in table)/.test(error.detail)
+
+      if (shelfDoesNotExists) {
+        if (addedBook)
+          await this.bookRepository.updateBook({
+            ...addedBook,
+            totalCount: 0,
+            availableCount: 0,
+          })
+
+        throw new BadRequestException(
+          `Invalid shelf code given, no shelves assigned to book`
+        )
+      }
+      throw error
+    }
   }
 
   public bulkAddBook = async (file: UploadedFile): Promise<Book[]> => {
@@ -144,7 +173,7 @@ class BookService {
           publisher: publisher,
           releaseDate: releaseDate,
           totalCount: totalCount,
-          availableCount: totalCount
+          availableCount: totalCount,
         }
 
         const bookDto = plainToInstance(BookDto, {
@@ -183,32 +212,51 @@ class BookService {
 
     const totalCount = currentBook.totalCount + availableCountDifference
 
-    const updatedBook = await this.bookRepository.updateBook({
-      ...currentBook,
-      ...(bookDto as any),
-      totalCount: totalCount,
-      availableCount: availableCount,
-    })
+    try {
+      const updatedBook = await this.bookRepository.updateBook({
+        ...currentBook,
+        ...(bookDto as any),
+        totalCount: totalCount,
+        availableCount: availableCount,
+      })
 
-    const currentShelfEntries = await this.bookShelfJnRepository.getAllEntries(
-      updatedBook.isbn
-    )
+      const currentShelfEntries =
+        await this.bookShelfJnRepository.getAllEntries(updatedBook.isbn)
 
-    const updatedShelfEntries = updatedShelves.map((updatedShelf) => ({
-      ...currentShelfEntries.find(
-        (currentShelfEntry) =>
-          currentShelfEntry.shelfCode === updatedShelf.shelfCode
-      ),
-      ...updatedShelf,
-      bookIsbn: bookDto.isbn,
-    }))
+      const updatedShelfEntries = updatedShelves.map((updatedShelf) => ({
+        ...currentShelfEntries.find(
+          (currentShelfEntry) =>
+            currentShelfEntry.shelfCode === updatedShelf.shelfCode
+        ),
+        ...updatedShelf,
+        bookIsbn: bookDto.isbn,
+      }))
 
-    await this.bookShelfJnRepository.addEntries([
-      ...currentShelfEntries,
-      ...updatedShelfEntries,
-    ])
+      await this.bookShelfJnRepository.addEntries([
+        ...currentShelfEntries,
+        ...updatedShelfEntries,
+      ])
 
-    return updatedBook
+      return updatedBook
+
+    } catch (error) {
+      const isbnAlreadyExists = /(isbn)[\s\S]+(already exists)/.test(
+        error.detail
+      )
+
+      if (isbnAlreadyExists)
+        throw new BadRequestException(`Book id and ISBN does not match`)
+
+      const shelfDoesNotExists =
+        /(shelf_code)[\s\S]+(is not present in table)/.test(error.detail)
+
+      if (shelfDoesNotExists) {
+        await this.bookRepository.updateBook(currentBook)
+        throw new BadRequestException(`Invalid shelf code present in request`)
+      }
+
+      throw error
+    }
   }
 
   public removeBook = async (id: string): Promise<Book> => {
