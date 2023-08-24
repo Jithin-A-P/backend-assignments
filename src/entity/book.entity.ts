@@ -46,6 +46,8 @@ class Book extends AbstractEntity {
   subscriptions?: Subscription[]
 
   shelves?: any[]
+
+  borrowedBy?: any[]
 }
 
 export default Book
