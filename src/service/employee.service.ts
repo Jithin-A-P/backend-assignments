@@ -29,10 +29,11 @@ class EmployeeService {
     if (!employee)
       throw new NotFoundException(`Employee not found with id: ${id}`)
 
-    employee.borrowedBooks = employee.borrowedBooks.map((borrowedBook) => {
-      if (!borrowedBook.returnedAt)
-        return borrowedBook.book
-    }) 
+    employee.borrowedBooks = employee.borrowedBooks.map((borrowedBook) => ({
+      ...borrowedBook.book,
+      borrowedAt: borrowedBook.borrowedAt,
+      returnedAt: borrowedBook.returnedAt
+    })) 
     
     return employee
   }
