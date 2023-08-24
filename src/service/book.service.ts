@@ -23,6 +23,7 @@ import NotificationService from './notification.service'
 import SubscriptionStatus from '../utils/subscription-status.enum'
 import ValidationException from '../exception/validation.exception'
 import CronService from './cron.service'
+import ShelfService from './shelf.service'
 
 class BookService {
   constructor(
@@ -31,6 +32,7 @@ class BookService {
     private borrowedBookRepository: BorrowedBookRepository,
     private subscriptionRepository: SubscriptionRepository,
     private employeeRepository: EmployeeRepository,
+    private shelfService: ShelfService,
     private notificationService: NotificationService,
     private cronService: CronService
   ) {}
@@ -135,6 +137,35 @@ class BookService {
       }
       throw error
     }
+  }
+
+  public getTemplate = async (): Promise<string> => {
+    const headers = [
+      [
+        'Title',
+        'Author',
+        'ISBN',
+        'Category',
+        'Description',
+        'Publisher',
+        'Release Date',
+      ],
+    ]
+
+    const shelfCodes = (await this.shelfService.getAllShelves()).map(
+      (shelf) => shelf.shelfCode
+    )
+
+    headers[0].push(...shelfCodes)
+
+    const sheet = xlsx.utils.aoa_to_sheet(headers)
+    const template = xlsx.utils.book_new()
+    xlsx.utils.book_append_sheet(template, sheet, 'Books')
+
+    const templateName = 'templates/sample.xlsx'
+    xlsx.writeFile(template, templateName)
+
+    return templateName
   }
 
   public bulkAddBook = async (file: UploadedFile): Promise<Book[]> => {
@@ -405,7 +436,10 @@ class BookService {
 
     await this.notificationService.addNotifications(newNotifications)
 
-    const cronJob = await this.cronService.getCronJob(employeeId, borrowedBook.id)
+    const cronJob = await this.cronService.getCronJob(
+      employeeId,
+      borrowedBook.id
+    )
 
     await this.cronService.removeCronJob(cronJob)
 
