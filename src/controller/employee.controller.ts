@@ -9,12 +9,13 @@ import LoginDto from '../dto/login.dto'
 import EditEmployeeDto from '../dto/edit-employee.dto'
 import { isUUID } from 'class-validator'
 import BadRequestException from '../exception/bad-request.exception'
+import validateQuery from '../middleware/validate-query.middleware'
 
 class EmployeeController {
   public router: Router
   constructor(private employeeService: EmployeeService) {
     this.router = Router()
-    this.router.get('/', authenticate, this.getAllEmployees)
+    this.router.get('/', authenticate, validateQuery, this.getAllEmployees)
     this.router.post(
       '/',
       authenticate,
