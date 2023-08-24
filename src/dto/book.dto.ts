@@ -3,12 +3,13 @@ import {
   IsNotEmpty,
   IsString,
   IsDateString,
-  IsNumber,
   ValidateIf,
   IsArray,
   ValidateNested,
+  IsEnum,
 } from "class-validator";
 import ShelfDetailsDto from "./shelf-details.dto";
+import BookCategory from "../utils/book-category.enum";
 
 class BookDto {
   @IsNotEmpty()
@@ -24,7 +25,7 @@ class BookDto {
   author: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsEnum(BookCategory)
   category: string;
 
   @ValidateIf((obj) => obj.value !== undefined)
