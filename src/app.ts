@@ -17,6 +17,7 @@ import shelfRoute from './routes/shelf.route'
 import bookRoute from './routes/book.route'
 import notificationRoute from './routes/notification.route'
 import bookCategoryRoute from './routes/book-category.route'
+import schdeduleOverdueNotifications from './utils/schedule-overdue-notification'
 
 const server = express()
 const PORT = process.env.PORT
@@ -41,6 +42,8 @@ dataSource
     server.listen(PORT, () => {
       logger.log({ level: 'info', message: `Server started on port : ${PORT}` })
     })
+    
+    schdeduleOverdueNotifications()
   })
   .catch((error: Error) => {
     logger.log({

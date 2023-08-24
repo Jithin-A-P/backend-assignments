@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm'
 import AbstractEntity from './absract.entity'
 import Shelf from './shelf.entity'
 import Employee from './employee.entity'
 import Book from './book.entity'
+import CronJob from './cron-job.entity'
 
 @Entity()
 class BorrowedBook extends AbstractEntity {
@@ -13,10 +14,19 @@ class BorrowedBook extends AbstractEntity {
   bookIsbn: string
 
   @Column()
+  borrowedAt: string
+
+  @Column({ nullable: true })
+  returnedAt?: string
+
+  @Column()
   shelfBorrowedFrom: string
 
   @Column({ nullable: true })
   shelfReturnedTo?: string
+  
+  @OneToOne(() => CronJob, (cronJob) => cronJob.borrowedBook)
+  overdueCronJob?: CronJob
 
   @ManyToOne(() => Shelf, (shelf) => shelf.borrowedBooks)
   @JoinColumn({
@@ -46,11 +56,6 @@ class BorrowedBook extends AbstractEntity {
   })
   employee?: Employee
 
-  @Column()
-  borrowedAt: string
-
-  @Column({ nullable: true })
-  returnedAt?: string
 }
 
 export default BorrowedBook
