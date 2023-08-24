@@ -22,6 +22,7 @@ import NotificationType from '../utils/notification-type.enum'
 import NotificationService from './notification.service'
 import SubscriptionStatus from '../utils/subscription-status.enum'
 import ValidationException from '../exception/validation.exception'
+import CronService from './cron.service'
 
 class BookService {
   constructor(
@@ -30,7 +31,8 @@ class BookService {
     private borrowedBookRepository: BorrowedBookRepository,
     private subscriptionRepository: SubscriptionRepository,
     private employeeRepository: EmployeeRepository,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cronService: CronService
   ) {}
 
   public getAllBooks = (
@@ -142,6 +144,8 @@ class BookService {
       defval: null,
     })
 
+    console.log(booksData)
+
     const bookShelfJnEntries = []
     const bookEntries = []
 
@@ -243,7 +247,6 @@ class BookService {
       ])
 
       return updatedBook
-
     } catch (error) {
       const isbnAlreadyExists = /(isbn)[\s\S]+(already exists)/.test(
         error.detail
@@ -318,6 +321,11 @@ class BookService {
     await this.bookRepository.updateBook({
       ...book,
       availableCount: book.availableCount - 1,
+    })
+
+    await this.cronService.addCronJob({
+      employeeId: borrowBookDto.employeeId,
+      borrowedBookId: borrowedBook.id,
     })
 
     return borrowedBook
@@ -396,6 +404,10 @@ class BookService {
     await this.subscriptionRepository.updateSubscriptions(updatedSubscriptions)
 
     await this.notificationService.addNotifications(newNotifications)
+
+    const cronJob = await this.cronService.getCronJob(employeeId, borrowedBook.id)
+
+    await this.cronService.removeCronJob(cronJob)
 
     return updatedBorrowedBook
   }

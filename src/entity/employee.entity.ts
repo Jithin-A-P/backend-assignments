@@ -17,6 +17,7 @@ import Notification from './notification.entity'
 import BorrowedBook from './borrowed-book.entity'
 import Book from './book.entity'
 import Subscription from './subscription.entity'
+import CronJob from './cron-job.entity'
 
 @Entity('employee')
 class Employee extends AbstractEntity {
@@ -62,6 +63,9 @@ class Employee extends AbstractEntity {
 
   @OneToMany(() => Subscription, (subscription) => subscription.requestTo)
   requestToUser?: Subscription[]
+
+  @OneToMany(() => CronJob, (cronJob) => cronJob.employee)
+  cronJobs?: CronJob[]
 }
 
 export default Employee
