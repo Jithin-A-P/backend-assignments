@@ -28,7 +28,6 @@ class BookController {
       '/upload',
       authenticate,
       authorize([Role.ADMIN]),
-      validateBody(BookDto),
       this.blukAddBooks
     )
     this.router.post(
