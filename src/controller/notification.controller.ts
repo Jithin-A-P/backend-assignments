@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express'
 import NotificationService from '../service/notification.service'
 import EditNotificationDto from '../dto/edit-notification.dto'
 import validateBody from '../middleware/validate-body.middleware'
-import autheticate from '../middleware/authenticate.middleware'
+import authenticate from '../middleware/authenticate.middleware'
 import BadRequestException from '../exception/bad-request.exception'
 import { isUUID } from 'class-validator'
 
@@ -10,10 +10,10 @@ class NotificationController {
   public router: Router
   constructor(private notificationService: NotificationService) {
     this.router = Router()
-    this.router.get('/', autheticate, this.getNotifications)
+    this.router.get('/', authenticate, this.getNotifications)
     this.router.patch(
       '/:id',
-      autheticate,
+      authenticate,
       validateBody(EditNotificationDto),
       this.editNotification
     )

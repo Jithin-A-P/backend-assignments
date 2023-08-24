@@ -5,7 +5,7 @@ import BookService from '../service/book.service'
 import BookDto from '../dto/book.dto'
 import validateBody from '../middleware/validate-body.middleware'
 import BorrowBookDto from '../dto/borrow-book.dto'
-import autheticate from '../middleware/authenticate.middleware'
+import authenticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import SubscriptionDto from '../dto/subscription.dto'
@@ -15,50 +15,50 @@ class BookController {
   public router: Router
   constructor(private bookService: BookService) {
     this.router = Router()
-    this.router.get('/', autheticate, this.getAllBooks)
-    this.router.get('/:id', autheticate, this.getBookById)
+    this.router.get('/', authenticate, this.getAllBooks)
+    this.router.get('/:id', authenticate, this.getBookById)
     this.router.post(
       '/',
-      autheticate,
+      authenticate,
       authorize([Role.ADMIN]),
       validateBody(BookDto),
       this.addBook
     )
     this.router.post(
       '/upload',
-      autheticate,
+      authenticate,
       authorize([Role.ADMIN]),
       validateBody(BookDto),
       this.blukAddBooks
     )
     this.router.post(
       '/:isbn/lend',
-      autheticate,
+      authenticate,
       validateBody(BorrowBookDto),
       this.borrowBook
     )
     this.router.post(
       '/:isbn/return',
-      autheticate,
+      authenticate,
       validateBody(BorrowBookDto),
       this.returnBook
     ),
       this.router.post(
         '/:id/subscribe',
-        autheticate,
+        authenticate,
         validateBody(SubscriptionDto),
         this.addSubscription
       ),
       this.router.put(
         '/:id',
-        autheticate,
+        authenticate,
         authorize([Role.ADMIN]),
         validateBody(BookDto),
         this.updateBook
       )
     this.router.delete(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.ADMIN]),
       this.removeBook
     )

@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { isUUID } from 'class-validator'
-import autheticate from '../middleware/authenticate.middleware'
+import authenticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import Role from '../utils/role.enum'
 import DepartmentService from '../service/department.service'
@@ -13,32 +13,32 @@ class DepartmentController {
   public router: Router
   constructor(private departmentService: DepartmentService) {
     this.router = Router()
-    this.router.get('/', autheticate, this.getAllDepartments)
+    this.router.get('/', authenticate, this.getAllDepartments)
     this.router.post(
       '/',
-      autheticate,
+      authenticate,
       authorize([Role.ADMIN, Role.HR]),
       validateBody(DepartmentDto),
       this.addDepartment
     )
-    this.router.get('/:id', autheticate, this.getDepartmentById)
+    this.router.get('/:id', authenticate, this.getDepartmentById)
     this.router.put(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.ADMIN, Role.HR]),
       validateBody(DepartmentDto),
       this.updateDepartmentById
     )
     this.router.patch(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.HR, Role.ADMIN]),
       validateBody(EditDepartmentDto),
       this.editDepartmentById
     )
     this.router.delete(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.ADMIN, Role.HR]),
       this.removeDepartmentById
     )

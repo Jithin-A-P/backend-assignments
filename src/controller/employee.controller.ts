@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import EmployeeService from '../service/employee.service'
 import EmployeeDto from '../dto/employee.dto'
-import autheticate from '../middleware/authenticate.middleware'
+import authenticate from '../middleware/authenticate.middleware'
 import authorize from '../middleware/authorize.middleware'
 import validateBody from '../middleware/validate-body.middleware'
 import Role from '../utils/role.enum'
@@ -14,32 +14,32 @@ class EmployeeController {
   public router: Router
   constructor(private employeeService: EmployeeService) {
     this.router = Router()
-    this.router.get('/', autheticate, this.getAllEmployees)
+    this.router.get('/', authenticate, this.getAllEmployees)
     this.router.post(
       '/',
-      autheticate,
+      authenticate,
       authorize([Role.HR, Role.ADMIN]),
       validateBody(EmployeeDto),
       this.addEmployee
     )
-    this.router.get('/:id', autheticate, this.getEmployeeById)
+    this.router.get('/:id', authenticate, this.getEmployeeById)
     this.router.put(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.HR, Role.ADMIN]),
       validateBody(EmployeeDto),
       this.updateEmployeeById
     )
     this.router.patch(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.HR, Role.ADMIN]),
       validateBody(EditEmployeeDto),
       this.editEmployeeById
     )
     this.router.delete(
       '/:id',
-      autheticate,
+      authenticate,
       authorize([Role.HR, Role.ADMIN]),
       this.removeEmployeeById
     )

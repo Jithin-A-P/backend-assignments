@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import Role from '../utils/role.enum'
-import autheticate from '../middleware/authenticate.middleware'
+import authenticate from '../middleware/authenticate.middleware'
 
 class RoleController {
   public router: Router
 
   constructor() {
     this.router = Router()
-    this.router.get('/', autheticate, this.getRoles)
+    this.router.get('/', authenticate, this.getRoles)
   }
 
   private getRoles = (req: Request, res: Response, next: NextFunction) => {

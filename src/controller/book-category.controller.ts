@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import autheticate from '../middleware/authenticate.middleware'
+import authenticate from '../middleware/authenticate.middleware'
 import BookCategory from '../utils/book-category.enum'
 
 class BookCategoryController {
@@ -7,7 +7,7 @@ class BookCategoryController {
 
   constructor() {
     this.router = Router()
-    this.router.get('/', autheticate, this.getBookCategories)
+    this.router.get('/', authenticate, this.getBookCategories)
   }
 
   private getBookCategories = (

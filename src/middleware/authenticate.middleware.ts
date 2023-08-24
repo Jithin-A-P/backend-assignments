@@ -4,7 +4,7 @@ import JwtPayload from '../utils/jwt-payload.type'
 import RequestWithUser from '../utils/request-with-user.interface'
 import HttpException from '../exception/http.exception'
 
-const autheticate = async (
+const authenticate = async (
   req: RequestWithUser,
   res: Response,
   next: NextFunction
@@ -32,4 +32,4 @@ const getTokenFromRequestHeader = (req: Request) => {
   return token
 }
 
-export default autheticate
+export default authenticate
