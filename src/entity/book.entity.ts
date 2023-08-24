@@ -3,6 +3,7 @@ import AbstractEntity from './absract.entity'
 import BookShelfJn from './book-shelf-jn.entity'
 import BorrowedBook from './borrowed-book.entity'
 import Subscription from './subscription.entity'
+import BookCategory from '../utils/book-category.enum'
 
 @Entity()
 class Book extends AbstractEntity {
@@ -16,7 +17,7 @@ class Book extends AbstractEntity {
   author: string
 
   @Column()
-  category: string
+  category: BookCategory
 
   @Column({ nullable: true })
   description?: string
