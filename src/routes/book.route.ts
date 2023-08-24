@@ -17,6 +17,9 @@ import NotificationService from '../service/notification.service'
 import CronJobRepository from '../repository/cron-job.repository'
 import CronJob from '../entity/cron-job.entity'
 import CronService from '../service/cron.service'
+import ShelfService from '../service/shelf.service'
+import ShelfRepository from '../repository/shelf.repository'
+import Shelf from '../entity/shelf.entity'
 
 const bookRepository = new BookRepository(dataSource.getRepository(Book))
 const bookShelfJnRepository = new BookShelfJnRepository(
@@ -37,6 +40,11 @@ const subscriptionRepository = new SubscriptionRepository(
 const employeeRepository = new EmployeeRepository(
   dataSource.getRepository(Employee)
 )
+const shelfService = new ShelfService(
+  new ShelfRepository(
+    dataSource.getRepository(Shelf)
+  )
+)
 const cronJobRepository = new CronJobRepository(
   dataSource.getRepository(CronJob)
 )
@@ -48,6 +56,7 @@ const bookService = new BookService(
   borrowedBookRepository,
   subscriptionRepository,
   employeeRepository,
+  shelfService,
   notificationService,
   cronService
 )
