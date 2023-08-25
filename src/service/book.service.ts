@@ -24,6 +24,7 @@ import SubscriptionStatus from '../utils/subscription-status.enum'
 import ValidationException from '../exception/validation.exception'
 import CronService from './cron.service'
 import ShelfService from './shelf.service'
+import sendMail from './email.service'
 
 class BookService {
   constructor(
@@ -479,8 +480,9 @@ class BookService {
       newNotification.employeeId = subscriptionDto.requestedTo
       newNotification.status = NotificationStatus.UNREAD
       newNotification.type = NotificationType.REQUEST
-
-      await this.notificationService.addNotification(newNotification)
+      const { email: to_email } = await this.employeeRepository.findById(newNotification.employeeId);
+      sendMail(to_email, newNotification.type, newNotification.content);
+      await this.notificationService.addNotification(newNotification);
     }
 
     return newSubscription
