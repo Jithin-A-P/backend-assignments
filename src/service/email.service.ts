@@ -24,3 +24,5 @@ const sendMail = (to, subject, message) => {
     else console.log(info)
   })
 }
+
+export default sendMail
