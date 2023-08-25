@@ -149,6 +149,7 @@ class BookService {
         'Description',
         'Publisher',
         'Release Date',
+        'Thumbnail URL'
       ],
     ]
 
@@ -190,6 +191,7 @@ class BookService {
           Description: description,
           Publisher: publisher,
           'Release Date': releaseDate,
+          'Thumbnail URL': thumbnailUrl,
           ...shelvesData
         } = bookData as any
 
@@ -214,6 +216,7 @@ class BookService {
           releaseDate: releaseDate,
           totalCount: totalCount,
           availableCount: totalCount,
+          thumbnailUrl: thumbnailUrl,
         }
 
         const bookDto = plainToInstance(BookDto, {
