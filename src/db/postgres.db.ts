@@ -13,6 +13,7 @@ import BorrowedBook from '../entity/borrowed-book.entity'
 import Notification from '../entity/notification.entity'
 import Subscription from '../entity/subscription.entity'
 import CronJob from '../entity/cron-job.entity'
+import NotificationChannel from '../entity/notification-mode.entity'
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -32,6 +33,7 @@ const dataSource = new DataSource({
     Notification,
     Subscription,
     CronJob,
+    NotificationChannel
   ],
   logging: false,
   namingStrategy: new SnakeNamingStrategy(),

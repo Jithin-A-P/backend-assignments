@@ -18,8 +18,8 @@ class BookController {
     this.router = Router()
     this.router.get(
       '/download-template',
-      authenticate,
-      authorize([Role.ADMIN]),
+      // authenticate,
+      // authorize([Role.ADMIN]),
       this.downloadTemplate
     )
     this.router.get('/', authenticate, validateQuery, this.getAllBooks)
